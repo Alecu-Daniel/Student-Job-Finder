@@ -69,6 +69,7 @@ namespace Student_Job_Finder.Controllers
 
             throw new Exception("Failed to Add User");
         }
+
         [HttpDelete("DeleteUser/{userId}")]
         public IActionResult DeleteUser(int userId)
         {
