@@ -5,6 +5,8 @@ using Student_Job_Finder.Models;
 
 namespace Student_Job_Finder.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class UserController : Controller
     {
 
