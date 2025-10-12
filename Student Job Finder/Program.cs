@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
@@ -6,13 +10,43 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+
+string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
+
+SymmetricSecurityKey tokenKey = new SymmetricSecurityKey(
+       Encoding.UTF8.GetBytes(
+           tokenKeyString != null ? tokenKeyString : ""
+       )
+   );
+
+TokenValidationParameters tokenValidationParameters = new TokenValidationParameters()
+{
+    IssuerSigningKey = tokenKey,
+    ValidateIssuer = false,
+    ValidateIssuerSigningKey = false,
+    ValidateAudience = false
+};
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(option =>
+    {
+        option.TokenValidationParameters = tokenValidationParameters;
+    });
+
 var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+
+
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
