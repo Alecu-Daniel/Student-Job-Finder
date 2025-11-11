@@ -10,6 +10,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<StudentSkillService>();
 
 
 string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
