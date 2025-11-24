@@ -17,7 +17,6 @@ using System.Text;
 namespace Student_Job_Finder.Controllers
 {
     [Authorize]
-    [ApiController]
     [Route("[controller]")]
     public class AuthController : Controller
     {
@@ -28,6 +27,20 @@ namespace Student_Job_Finder.Controllers
         {
             _dapper = new DataContextDapper(config);
             _authHelper = new AuthHelper(config);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("Register")]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("Login")]
+        public IActionResult Login()
+        {
+            return View();
         }
 
         [AllowAnonymous]
@@ -83,7 +96,7 @@ namespace Student_Job_Finder.Controllers
                         
                         if(_dapper.ExecuteSql(sqlAddUser))
                         {
-                            return Ok();
+                            return RedirectToAction("Index", "Home");
                         }
                         throw new Exception("Failed to Add user");
                     }
@@ -123,10 +136,29 @@ namespace Student_Job_Finder.Controllers
 
             int userId = _dapper.LoadDataSingle<int>(userIdSql);
 
-            return Ok(new Dictionary<string, string> {
+
+            if (Request.ContentType.Contains("application/json"))
+            {
+                return Ok(new Dictionary<string, string> {
                 {"token", _authHelper.CreateToken(userId)}
             });
+
+            }
+
+            var token = _authHelper.CreateToken(userId);
+            Response.Cookies.Append("jwt", token);
+            return RedirectToAction("Index", "Home");
         }
+
+        [Authorize]
+        [HttpPost("Logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
+
+            return RedirectToAction("Index", "Home");
+        }
+
 
         [HttpGet("RefreshToken")]
         public IActionResult RefreshToken()
