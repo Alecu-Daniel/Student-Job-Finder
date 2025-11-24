@@ -1,0 +1,18 @@
+﻿@model Student_Job_Finder.Dtos.UserForLoginDto
+
+<h2>Login</h2>
+
+<form action="/Auth/Login" method="post">
+
+    <div>
+        <label>Email</label>
+        <input asp-for="Email" name="Email" type="email" required />
+    </div>
+
+    <div>
+        <label>Password</label>
+        <input asp-for="Password" name="Password" type="password" required />
+    </div>
+
+    <button type="submit">Login</button>
+</form>

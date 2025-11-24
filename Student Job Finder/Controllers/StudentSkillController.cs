@@ -44,7 +44,7 @@ namespace Student_Job_Finder.Controllers
 
 
         [HttpGet("MySkills")]
-        public IEnumerable<StudentSkill> MySkills()
+        public  IActionResult MySkills()
         {
             string sql = @"
                 SELECT [StudentSkillId],
@@ -53,7 +53,15 @@ namespace Student_Job_Finder.Controllers
                     [SkillScore]
                     FROM JobFinderSchema.StudentSkills
                 WHERE StudentId = " + this.User.FindFirst("userId").Value;
-            return _dapper.LoadData<StudentSkill>(sql);
+
+            var skills = _dapper.LoadData<StudentSkill>(sql);
+
+            var vm = new StudentSkillsViewModel
+            {
+                Skills = skills.ToList()
+            };
+
+            return View("~/Views/Profile/Profile.cshtml", vm);
         }
 
 

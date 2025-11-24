@@ -1,0 +1,40 @@
+﻿@model Student_Job_Finder.Dtos.UserForRegistrationDto
+
+<h2>Create an Account</h2>
+
+<form action="/Auth/Register" method="post">
+    <div>
+        <label>First Name</label>
+        <input asp-for="FirstName" name="FirstName" required />
+    </div>
+
+    <div>
+        <label>Last Name</label>
+        <input asp-for="LastName" name="LastName" required />
+    </div>
+
+    <div>
+        <label>Email</label>
+        <input asp-for="Email" name="Email" type="email" required />
+    </div>
+
+    <div>
+        <label>Password</label>
+        <input asp-for="Password" name="Password" type="password" required />
+    </div>
+
+    <div>
+        <label>Confirm Password</label>
+        <input asp-for="PasswordConfirm" name="PasswordConfirm" type="password" required />
+    </div>
+
+    <div>
+        <label>Role</label>
+        <select asp-for="Role" name="Role" required>
+            <option value="Student">Student</option>
+            <option value="Recruiter">Recruiter</option>
+        </select>
+    </div>
+
+    <button type="submit">Register</button>
+</form>
