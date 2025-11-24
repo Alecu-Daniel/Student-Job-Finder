@@ -8,9 +8,15 @@
         if (score >= 0.66m) return "Intermediate";
         return "Beginner";
     }
-}
 
-<h2>My Skills</h2>
+    string SkillColorClass(decimal score)
+    {
+        if (score >= 0.86m) return "skill-expert";
+        if (score >= 0.76m) return "skill-advanced";
+        if (score >= 0.66m) return "skill-intermediate";
+        return "skill-beginner";
+    }
+}
 
 @if (Model.Skills.Count == 0)
 {
@@ -19,42 +25,39 @@
 else
 {
     <div class="skills-list">
-
         @foreach (var skill in Model.Skills)
         {
-            <div class="skill-card">
-                <h3>@skill.SkillName</h3>
-                <p>Level: @SkillLevel(skill.SkillScore)</p>
+            <div class="skill-card @SkillColorClass(skill.SkillScore)">
+                <div class="skill-color-bar"></div>
+                <div class="skill-card-content">
+                    <h3>@skill.SkillName</h3>
+                    <p>Level: <span class="skill-level @SkillColorClass(skill.SkillScore)">@SkillLevel(skill.SkillScore)</span></p>
+                </div>
             </div>
         }
-
     </div>
 }
 
+<div class="pdf-upload-section">
+    @if (Model.Skills.Count == 0)
+    {
+        <h3 class="pdf-text-heading">Upload a PDF to Extract Skills</h3>
+    }
+    else
+    {
+        <h3 class="pdf-text-heading">Reupload a PDF to Recalculate Skills</h3>
+    }
+    <p class="pdf-text">Please upload a PDF containing your skills. The system will extract them automatically.</p>
 
-@if (Model.Skills.Count == 0)
-{
-    <h3>Upload a PDF to Extract Skills</h3>
-    <p>Please upload a PDF containing your skills. The system will extract them automatically.</p>
-    <form id="pdfForm" action="/SkillExtractor/ExtractSkills" method="post" enctype="multipart/form-data">
+    <form id="pdfForm" class="pdf-form" action="/SkillExtractor/ExtractSkills" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept=".pdf" required />
-        <button type="submit">Upload PDF</button>
+        <button type="submit" class="btn btn--form">Upload PDF</button>
     </form>
-}
-else
-{
-    <h3>Reupload a PDF to Recalculate Skills</h3>
-    <p>Please upload a PDF containing your skills. The system will extract them automatically.</p>
-    <form id="pdfForm" action="/SkillExtractor/ExtractSkills" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".pdf" required />
-        <button type="submit">Upload PDF</button>
-    </form>
-}
+</div>
 
-
-<div id="loading" style="display:none;">
-    <h3>Processing your PDF…</h3>
-    <p>Please wait, this may take 5–15 seconds.</p>
+<div id="loading" class="loading-screen" style="display:none;">
+    <h3 class="pdf-text-heading">Processing your PDF…</h3>
+    <p class="pdf-text">Please wait, this may take 5–15 seconds.</p>
 </div>
 
 <script>
