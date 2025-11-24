@@ -1,40 +1,44 @@
 ﻿@model Student_Job_Finder.Dtos.UserForRegistrationDto
 
-<h2>Create an Account</h2>
+<section class="register-section">
+    <div class="register-container">
+        <h2 class="heading-primary">Create an Account</h2>
 
-<form action="/Auth/Register" method="post">
-    <div>
-        <label>First Name</label>
-        <input asp-for="FirstName" name="FirstName" required />
+        <form action="/Auth/Register" method="post" class="register-form">
+            <div class="form-group">
+                <label asp-for="FirstName">First Name</label>
+                <input asp-for="FirstName" name="FirstName" required />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LastName">Last Name</label>
+                <input asp-for="LastName" name="LastName" required />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" name="Email" type="email" required />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" name="Password" type="password" required />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PasswordConfirm">Confirm Password</label>
+                <input asp-for="PasswordConfirm" name="PasswordConfirm" type="password" required />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Role">Role</label>
+                <select asp-for="Role" name="Role" required>
+                    <option value="Student">Student</option>
+                    <option value="Recruiter">Recruiter</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn--form">Register</button>
+        </form>
     </div>
-
-    <div>
-        <label>Last Name</label>
-        <input asp-for="LastName" name="LastName" required />
-    </div>
-
-    <div>
-        <label>Email</label>
-        <input asp-for="Email" name="Email" type="email" required />
-    </div>
-
-    <div>
-        <label>Password</label>
-        <input asp-for="Password" name="Password" type="password" required />
-    </div>
-
-    <div>
-        <label>Confirm Password</label>
-        <input asp-for="PasswordConfirm" name="PasswordConfirm" type="password" required />
-    </div>
-
-    <div>
-        <label>Role</label>
-        <select asp-for="Role" name="Role" required>
-            <option value="Student">Student</option>
-            <option value="Recruiter">Recruiter</option>
-        </select>
-    </div>
-
-    <button type="submit">Register</button>
-</form>
+</section>

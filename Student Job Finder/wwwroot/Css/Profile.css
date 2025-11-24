@@ -1,0 +1,133 @@
+﻿.skills-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    margin-top: 3rem;
+}
+
+
+.skill-card {
+    display: flex;
+    align-items: center;
+    width: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+
+.skill-color-bar {
+    width: 8px;
+    height: 100%;
+}
+
+
+.skill-card-content {
+    flex: 1;
+    padding: 1rem 1.5rem;
+}
+
+    .skill-card-content h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.6rem;
+        color: #333;
+    }
+
+    .skill-card-content p {
+        margin: 0;
+        font-weight: 500;
+        font-size: 1.4rem;
+    }
+
+
+.skill-beginner .skill-color-bar {
+    background-color: #e74c3c;
+}
+
+.skill-intermediate .skill-color-bar {
+    background-color: #e67e22;
+}
+
+.skill-advanced .skill-color-bar {
+    background-color: #f1c40f;
+}
+
+.skill-expert .skill-color-bar {
+    background-color: #2ecc71;
+}
+
+
+.skill-level.skill-beginner {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.skill-level.skill-intermediate {
+    color: #e67e22;
+    font-weight: 600;
+}
+
+.skill-level.skill-advanced {
+    color: #f1c40f;
+    font-weight: 600;
+}
+
+.skill-level.skill-expert {
+    color: #2ecc71;
+    font-weight: 600;
+}
+
+
+.pdf-upload-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 3rem;
+    text-align: center;
+}
+
+
+.pdf-text-heading {
+    font-size: 2.4rem;
+}
+
+.pdf-text {
+    font-size: 1.8rem;
+}
+
+.pdf-form {
+    margin-top: 1rem;
+}
+
+.pdf-upload-section input[type="file"] {
+    margin: 1rem 0;
+}
+
+
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+
+.btn--form {
+    background-color: #e67e22;
+    color: #fdf2e9;
+    padding: 1.2rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.6rem;
+    transition: all 0.3s;
+}
+
+    .btn--form:hover {
+        background-color: #cf711f;
+    }
