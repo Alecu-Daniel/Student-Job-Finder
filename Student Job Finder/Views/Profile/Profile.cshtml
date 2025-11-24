@@ -1,0 +1,64 @@
+﻿@model Student_Job_Finder.Models.StudentSkillsViewModel
+
+@functions {
+    string SkillLevel(decimal score)
+    {
+        if (score >= 0.86m) return "Expert";
+        if (score >= 0.76m) return "Advanced";
+        if (score >= 0.66m) return "Intermediate";
+        return "Beginner";
+    }
+}
+
+<h2>My Skills</h2>
+
+@if (Model.Skills.Count == 0)
+{
+    <p>You have no skills yet.</p>
+}
+else
+{
+    <div class="skills-list">
+
+        @foreach (var skill in Model.Skills)
+        {
+            <div class="skill-card">
+                <h3>@skill.SkillName</h3>
+                <p>Level: @SkillLevel(skill.SkillScore)</p>
+            </div>
+        }
+
+    </div>
+}
+
+
+@if (Model.Skills.Count == 0)
+{
+    <h3>Upload a PDF to Extract Skills</h3>
+    <p>Please upload a PDF containing your skills. The system will extract them automatically.</p>
+    <form id="pdfForm" action="/SkillExtractor/ExtractSkills" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf" required />
+        <button type="submit">Upload PDF</button>
+    </form>
+}
+else
+{
+    <h3>Reupload a PDF to Recalculate Skills</h3>
+    <p>Please upload a PDF containing your skills. The system will extract them automatically.</p>
+    <form id="pdfForm" action="/SkillExtractor/ExtractSkills" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf" required />
+        <button type="submit">Upload PDF</button>
+    </form>
+}
+
+
+<div id="loading" style="display:none;">
+    <h3>Processing your PDF…</h3>
+    <p>Please wait, this may take 5–15 seconds.</p>
+</div>
+
+<script>
+    document.getElementById("pdfForm").addEventListener("submit", function () {
+        document.getElementById("loading").style.display = "block";
+    });
+</script>

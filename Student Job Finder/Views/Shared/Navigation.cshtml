@@ -1,0 +1,35 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<header class="header">
+    <a href="/">
+        <img class="logo" alt="Site logo" src="~/img/omnifood-logo.png" />
+    </a>
+
+    <nav class="main-nav">
+        <ul class="main-nav-list">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <span>Hello @User.FindFirst("userId")?.Value</span>
+                <li><a class="main-nav-link" href="/StudentSkill/MySkills">Dashboard</a></li>
+                <li>
+                    <form action="/Auth/Logout" method="post">
+                        <button type="submit" class="main-nav-link">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            }
+            else
+            {
+                <li><a class="main-nav-link" href="/Auth/Register">Sign Up</a></li>
+
+
+                <li><a class="main-nav-link" href="/Auth/Login">Login</a></li>
+            }
+        </ul>
+    </nav>
+</header>

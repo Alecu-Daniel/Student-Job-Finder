@@ -33,6 +33,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(option =>
     {
         option.TokenValidationParameters = tokenValidationParameters;
+
+        option.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Pull token from the cookie
+                var token = context.Request.Cookies["jwt"];
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
 var app = builder.Build();
