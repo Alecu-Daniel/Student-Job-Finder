@@ -16,7 +16,6 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 namespace Student_Job_Finder.Controllers
 {
     [Authorize]
-    [ApiController]
     [Route("[controller]")]
     public class SkillExtractorController : Controller
     {
@@ -44,7 +43,7 @@ namespace Student_Job_Finder.Controllers
             using var fileStream = file.OpenReadStream();
             var streamContent = new StreamContent(fileStream);
 
-            // Required headers
+            
             streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
 
             content.Add(streamContent, "file", file.FileName);
@@ -142,7 +141,7 @@ namespace Student_Job_Finder.Controllers
             throw new Exception("Could not extract JSON from GPT response.");
         }
 
-        // Step 2: Calculate skills from courses JSON
+        
         private async Task<string> CalculateSkillsFromJson(JsonElement coursesJson)
         {
             string prompt = $@"
@@ -217,7 +216,7 @@ namespace Student_Job_Finder.Controllers
                 throw new Exception($"OpenAI API returned status {response.StatusCode}");
             }
 
-            // Parse JSON text from chat completion response
+            
             var root = JsonDocument.Parse(responseContent).RootElement;
             var skillJsonText = root
                 .GetProperty("choices")[0]
@@ -228,7 +227,7 @@ namespace Student_Job_Finder.Controllers
             return skillJsonText;
         }
 
-        // Map final JSON to DTO
+        
         private List<StudentSkillToAddDto> MapJsonToDto(string skillJson)
         {
             var skillsToAdd = new List<StudentSkillToAddDto>();
@@ -254,10 +253,10 @@ namespace Student_Job_Finder.Controllers
 
             string fileId = await UploadFileToOpenAI(file);
 
-            // 2️⃣ Extract courses JSON from PDF
+            
             string coursesJsonRaw = await ExtractCoursesJsonFromPdf(fileId);
 
-            // --- Robust JSON extraction using regex ---
+            
             var match = Regex.Match(coursesJsonRaw, @"\[\s*{.*}\s*\]", RegexOptions.Singleline);
             if (!match.Success)
                 return BadRequest("Could not find JSON array in GPT response from PDF extraction.");
@@ -274,10 +273,10 @@ namespace Student_Job_Finder.Controllers
                 return BadRequest("Failed to parse courses JSON from GPT response.");
             }
 
-            // 3️⃣ Calculate skills from courses JSON
+            
             string skillJsonText = await CalculateSkillsFromJson(coursesJson);
 
-            // --- Robust extraction for final skills JSON ---
+            
             var skillMatch = Regex.Match(skillJsonText, @"\[\s*{.*}\s*\]", RegexOptions.Singleline);
             if (!skillMatch.Success)
                 return BadRequest("Could not find skills JSON array in GPT response.");
@@ -294,15 +293,14 @@ namespace Student_Job_Finder.Controllers
                 return BadRequest("Failed to parse skills JSON from GPT response.");
             }
 
-            // 4️⃣ Insert into DB
+            
             var userId = this.User.FindFirst("userId")?.Value;
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("User not authenticated.");
 
             _skillsService.AddSkills(userId, skillsToAdd);
 
-            return Ok(skillsToAdd);
-            return Ok(JsonDocument.Parse(coursesJsonText).RootElement);
+            return RedirectToAction("MySkills", "StudentSkill");
         }
 
     }

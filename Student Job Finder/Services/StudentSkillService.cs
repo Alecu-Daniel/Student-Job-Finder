@@ -15,6 +15,12 @@ public class StudentSkillService
         if (string.IsNullOrEmpty(userId) || skills == null || skills.Count == 0)
             throw new Exception("Invalid user or no skills provided");
 
+        string deleteSql = $@"
+            DELETE FROM JobFinderSchema.StudentSkills
+            WHERE StudentId = {userId}";
+
+        _dapper.ExecuteSql(deleteSql);
+
         foreach (var skill in skills)
         {
             string sql = $@"
