@@ -89,30 +89,34 @@ namespace Student_Job_Finder.Controllers
             return _dapper.LoadDataSingle<JobPost>(sql);
         }
 
-        [HttpPost("JobPost")]
+        [HttpPost("AddPost")]
         public IActionResult AddPost(JobPostToAddDto postToAdd)
         {
-            string sql = @"
-            INSERT INTO JobFinderSchema.Posts(
-                [UserId],
-                [PostTitle],
-                [PostContent],
-                [PostCreated],
-                [PostUpdated]
-            ) VALUES (" + this.User.FindFirst("userId")?.Value
-            + ",'" + postToAdd.PostTitle
-            + "','" + postToAdd.PostContent
-            + "', GETDATE() , GETDATE() )";
-            if(_dapper.ExecuteSql(sql))
-            {
-                return Ok();
-            }
 
-            throw new Exception("Failed to create new post!");
+            if (this.User.FindFirst("userRole")?.Value == "Recruiter")
+            { 
+                string sql = @"
+                INSERT INTO JobFinderSchema.Posts(
+                    [UserId],
+                    [PostTitle],
+                    [PostContent],
+                    [PostCreated],
+                    [PostUpdated]
+                ) VALUES (" + this.User.FindFirst("userId")?.Value
+                + ",'" + postToAdd.PostTitle
+                + "','" + postToAdd.PostContent
+                + "', GETDATE() , GETDATE() )";
+                if(_dapper.ExecuteSql(sql))
+                {
+                    return Ok();
+                }
+                throw new Exception("Failed to create new post!");
+            }
+            throw new Exception("Only Recruiters can add job posts!");
         }
 
 
-        [HttpPut("JobPost")]
+        [HttpPut("EditPost")]
         public IActionResult EditPost(JobPostToEditDto postToEdit)
         {
             string sql = @"
@@ -132,7 +136,7 @@ namespace Student_Job_Finder.Controllers
         }
 
 
-        [HttpDelete("JobPost/{postId}")]
+        [HttpDelete("DeletePost/{postId}")]
         public IActionResult DeletePost(int postId)
         {
             string sql = @"DELETE FROM JobFinderSchema.Posts 
