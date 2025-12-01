@@ -136,16 +136,21 @@ namespace Student_Job_Finder.Controllers
 
             int userId = _dapper.LoadDataSingle<int>(userIdSql);
 
+            string userRoleSql = @"
+                SELECT Role FROM JobFinderSchema.Users WHERE Email = '" +
+                userForLogin.Email + "'";
+
+            string role = _dapper.LoadDataSingle<string>(userRoleSql);
 
             if (Request.ContentType.Contains("application/json"))
             {
                 return Ok(new Dictionary<string, string> {
-                {"token", _authHelper.CreateToken(userId)}
+                {"token", _authHelper.CreateToken(userId, role)}
             });
 
             }
 
-            var token = _authHelper.CreateToken(userId);
+            var token = _authHelper.CreateToken(userId, role);
             Response.Cookies.Append("jwt", token);
             return RedirectToAction("Index", "Home");
         }
@@ -170,8 +175,13 @@ namespace Student_Job_Finder.Controllers
 
             int userIdFromDb = _dapper.LoadDataSingle<int>(userIdSql);
 
+            string userRoleSql = @"
+                SELECT Role FROM JobFinderSchema.Users WHERE UserId = '" + userId + "'";
+
+            string role = _dapper.LoadDataSingle<string>(userRoleSql);
+
             return Ok(new Dictionary<string, string> {
-                {"token", _authHelper.CreateToken(userIdFromDb)}
+                {"token", _authHelper.CreateToken(userIdFromDb, role)}
             });
             
         }
