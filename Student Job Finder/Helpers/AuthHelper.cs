@@ -32,7 +32,7 @@ namespace Student_Job_Finder.Helpers
         {
             Claim[] claims = new Claim[] {
                     new Claim("userId", userId.ToString()),
-                    new Claim("role", role)
+                    new Claim("userRole", role)
             };
 
             string? tokenKeyString = _config.GetSection("AppSettings:TokenKey").Value;

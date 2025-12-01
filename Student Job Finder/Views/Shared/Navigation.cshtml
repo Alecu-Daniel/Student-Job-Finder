@@ -1,11 +1,22 @@
-﻿<header class="header">
+﻿@{
+    var role = User.FindFirst("userRole")?.Value;
+}
+
+
+<header class="header">
 
     <nav class="main-nav">
         <ul class="main-nav-list">
             @if (User.Identity.IsAuthenticated)
             {
-                <li><a class="main-nav-link" href="/StudentSkill/MySkills">Dashboard</a></li>
-
+                if (role == "Student")
+                {
+                    <li><a class="main-nav-link" href="/StudentSkill/MySkills">Dashboard</a></li>
+                } 
+                else if(role == "Recruiter")
+                {
+                    <li><a class="main-nav-link" href="/JobPost/MySkills">Job Posts</a></li>
+                }
                 <li>
                     <form action="/Auth/Logout" method="post">
                         <button type="submit" class="btn btn--form">Logout</button>
