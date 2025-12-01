@@ -28,10 +28,11 @@ namespace Student_Job_Finder.Helpers
                 );
         }
 
-        public string CreateToken(int userId)
+        public string CreateToken(int userId, string role)
         {
             Claim[] claims = new Claim[] {
-                    new Claim("userId", userId.ToString())
+                    new Claim("userId", userId.ToString()),
+                    new Claim("role", role)
             };
 
             string? tokenKeyString = _config.GetSection("AppSettings:TokenKey").Value;
