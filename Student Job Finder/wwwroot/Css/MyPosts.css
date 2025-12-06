@@ -1,0 +1,32 @@
+﻿.job-posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    align-items: center;
+}
+
+.job-post-card {
+    width: 100%;
+    max-width: 500px;
+    background-color: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+}
+
+    .job-post-card:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .job-post-card h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+        color: #333;
+    }
+
+    .job-post-card .post-date {
+        font-size: 1.4rem;
+        color: #666;
+    }

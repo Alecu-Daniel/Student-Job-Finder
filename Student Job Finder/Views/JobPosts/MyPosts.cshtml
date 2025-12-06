@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Student_Job_Finder.Models.JobPost>
+
+<h2>My Job Posts</h2>
+
+@if (!Model.Any())
+{
+    <p>You have no job posts yet.</p>
+    <a class="btn btn--form" href="/JobPost/AddPost">Add a post</a>
+}
+else
+{
+    <div class="job-posts-list">
+
+        <a class="btn btn--form" href="/JobPost/AddPost">Add a post</a>
+        @foreach (var post in Model)
+        {
+            <div class="job-post-card">
+                <h3><a href="/JobPost/PostSingle/@post.PostId">@post.PostTitle</a></h3>
+                <p class="post-date">Created: @post.PostCreated.ToString("dd MMM yyyy")</p>
+                <form method="post" action="/JobPost/DeletePost/@post.PostId">
+                    <button type="submit" class="btn btn--form">Delete this post</button>
+                </form>
+                <a class="btn btn--form" href="/JobPost/EditPost/@post.PostId">Edit this post</a>
+            </div>
+        }
+    </div>
+}
