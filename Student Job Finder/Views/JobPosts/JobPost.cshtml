@@ -1,0 +1,8 @@
+﻿@model Student_Job_Finder.Models.JobPost
+
+<div class="jobpost-container">
+    <h2>@Model.PostTitle</h2>
+    <p>@Model.PostContent</p>
+    <p><small>Created: @Model.PostCreated.ToString("g") | Updated: @Model.PostUpdated.ToString("g")</small></p>
+    <a class="btn btn--form" href="/JobPost/EditPost/@Model.PostId">Edit this post</a>
+</div>

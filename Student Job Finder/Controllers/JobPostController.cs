@@ -7,7 +7,6 @@ using Student_Job_Finder.Models;
 namespace Student_Job_Finder.Controllers
 {
     [Authorize]
-    [ApiController]
     [Route("[controller]")]
     public class JobPostController : Controller
     {
@@ -45,7 +44,7 @@ namespace Student_Job_Finder.Controllers
         }
 
         [HttpGet("MyPosts")]
-        public IEnumerable<JobPost> GetMyJobPosts()
+        public IActionResult GetMyJobPosts()
         {
             string sql = @"SELECT [PostId],
                 [UserId],
@@ -56,8 +55,11 @@ namespace Student_Job_Finder.Controllers
             FROM JobFinderSchema.Posts
                 WHERE UserId = " + this.User.FindFirst("userId")?.Value;
 
-            return _dapper.LoadData<JobPost>(sql);
+            var posts = _dapper.LoadData<JobPost>(sql);
+            return View("~/Views/JobPosts/MyPosts.cshtml", posts);
         }
+
+
 
         [HttpGet("PostsBySearch/{searchParam}")]
         public IEnumerable<JobPost> PostBySearch(string searchParam)
@@ -76,7 +78,7 @@ namespace Student_Job_Finder.Controllers
         }
 
         [HttpGet("PostSingle/{postId}")]
-        public JobPost GetJobPosts(int postId)
+        public IActionResult GetJobPost(int postId)
         {
             string sql = @"SELECT [PostId],
                 [UserId],
@@ -86,7 +88,34 @@ namespace Student_Job_Finder.Controllers
                 [PostUpdated]
             FROM JobFinderSchema.Posts
                 WHERE PostId = " + postId.ToString();
-            return _dapper.LoadDataSingle<JobPost>(sql);
+
+            var post = _dapper.LoadDataSingle<JobPost>(sql);
+
+            if (post == null)
+                return NotFound();
+
+            return View("~/Views/JobPosts/JobPost.cshtml", post);
+        }
+
+        [HttpGet("AddPost")]
+        public IActionResult AddPost()
+        {
+            if (User.FindFirst("userRole")?.Value != "Recruiter")
+                return Unauthorized("Only Recruiters can add job posts.");
+
+            return View("~/Views/JobPosts/AddPost.cshtml");
+        }
+
+        [HttpGet("EditPost/{postId}")]
+        public IActionResult EditPost(int postId)
+        {
+            if (User.FindFirst("userRole")?.Value != "Recruiter")
+                return Unauthorized("Only Recruiters can edit job posts.");
+
+            string sql = @"SELECT * FROM JobFinderSchema.Posts WHERE PostId = " + postId;
+            var post = _dapper.LoadDataSingle<JobPost>(sql);
+
+            return View("~/Views/JobPosts/EditPost.cshtml", post);
         }
 
         [HttpPost("AddPost")]
@@ -108,7 +137,7 @@ namespace Student_Job_Finder.Controllers
                 + "', GETDATE() , GETDATE() )";
                 if(_dapper.ExecuteSql(sql))
                 {
-                    return Ok();
+                    return RedirectToAction("MyPosts", "JobPost");
                 }
                 throw new Exception("Failed to create new post!");
             }
@@ -116,7 +145,7 @@ namespace Student_Job_Finder.Controllers
         }
 
 
-        [HttpPut("EditPost")]
+        [HttpPost("EditPost")]
         public IActionResult EditPost(JobPostToEditDto postToEdit)
         {
             string sql = @"
@@ -129,14 +158,14 @@ namespace Student_Job_Finder.Controllers
 
             if (_dapper.ExecuteSql(sql))
             {
-                return Ok();
+                return RedirectToAction("MyPosts", "JobPost");
             }
 
             throw new Exception("Failed to edit post!");
         }
 
 
-        [HttpDelete("DeletePost/{postId}")]
+        [HttpPost("DeletePost/{postId}")]
         public IActionResult DeletePost(int postId)
         {
             string sql = @"DELETE FROM JobFinderSchema.Posts 
@@ -145,7 +174,7 @@ namespace Student_Job_Finder.Controllers
 
             if (_dapper.ExecuteSql(sql))
             {
-                return Ok();
+                return RedirectToAction("MyPosts", "JobPost");
             }
 
             throw new Exception("Failed to delete post!");
