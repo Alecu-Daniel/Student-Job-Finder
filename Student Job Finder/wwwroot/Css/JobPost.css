@@ -1,0 +1,27 @@
+﻿.jobpost-container {
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+    .jobpost-container h2 {
+        font-size: 2.4rem;
+        margin-bottom: 1.2rem;
+        color: #333;
+    }
+
+    .jobpost-container p {
+        font-size: 1.6rem;
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 1.5rem;
+    }
+
+        .jobpost-container p small {
+            font-size: 1.2rem;
+            color: #999;
+        }
