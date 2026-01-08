@@ -1,8 +1,47 @@
-﻿@model Student_Job_Finder.Models.JobPost
+﻿@model Student_Job_Finder.Models.JobSkillsViewModel
+
+@{
+    var role = User.FindFirst("userRole")?.Value;
+}
 
 <div class="jobpost-container">
     <h2>@Model.PostTitle</h2>
+
     <p>@Model.PostContent</p>
-    <p><small>Created: @Model.PostCreated.ToString("g") | Updated: @Model.PostUpdated.ToString("g")</small></p>
-    <a class="btn btn--form" href="/JobPost/EditPost/@Model.PostId">Edit this post</a>
+
+    @if (Model.Skills.Any())
+    {
+        <hr />
+        <h3>Required Skills</h3>
+
+        <ul class="job-skills-list">
+            @foreach (var skill in Model.Skills)
+            {
+                <li>
+                    <strong>@skill.SkillName</strong>
+                    <span class="skill-level">
+                        (@SkillLevelName(skill.SkillScore))
+                    </span>
+                </li>
+            }
+        </ul>
+    }
+
+    @if(role == "Recruiter")
+    {
+        <a class="btn btn--form"
+           href="/JobPost/EditPost/@Model.PostId">
+            Edit this post
+        </a>
+    }
 </div>
+
+@functions {
+    string SkillLevelName(decimal score)
+    {
+        if (score >= 0.85m) return "Expert";
+        if (score >= 0.75m) return "Advanced";
+        if (score >= 0.65m) return "Intermediate";
+        return "Beginner";
+    }
+}
