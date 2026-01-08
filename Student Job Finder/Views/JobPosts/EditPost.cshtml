@@ -1,9 +1,10 @@
-﻿@model Student_Job_Finder.Models.JobPost
+﻿@model Student_Job_Finder.Models.JobSkillsViewModel
 
 <section class="edit-section">
     <div class="edit-container">
         <h2>Edit Job Post</h2>
 
+ 
         <form method="post" action="/JobPost/EditPost">
             <input type="hidden" name="PostId" value="@Model.PostId" />
 
@@ -19,5 +20,87 @@
 
             <button type="submit" class="btn btn--form">Save Changes</button>
         </form>
+
+        <hr />
+
+
+        <h3>Add a Job Skill</h3>
+
+        @if (Model.Skills.Any())
+        {
+            <div class="job-skills-section">
+                <h3>Required Skills</h3>
+
+                <ul class="job-skills-list">
+                    @foreach (var skill in Model.Skills)
+                    {
+                        <li class="job-skill-item">
+                            <span class="skill-info">
+                                <strong>@skill.SkillName</strong>
+                                <span class="skill-level">(@SkillLevelName(skill.SkillScore))</span>
+                            </span>
+
+                            <form method="post"
+                                  action="/JobPost/DeleteJobSkill/@skill.JobSkillId"
+                                  class="skill-delete-form">
+                                <input type="hidden" name="postId" value="@Model.PostId" />
+                                <button type="submit" class="skill-delete-btn" title="Remove skill">
+                                    ×
+                                </button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+
+
+
+        <form method="post" action="/JobPost/AddJobSkill">
+            <input type="hidden" name="JobPostId" value="@Model.PostId" />
+
+            <div class="form-group">
+                <label for="SkillName">Skill</label>
+                <select id="SkillName" name="SkillName" required>
+                    <option value="">--Select a skill--</option>
+                    <option value="Software Development">Software Development</option>
+                    <option value="Algorithms and Data Structures">Algorithms and Data Structures</option>
+                    <option value="Computer Architecture">Computer Architecture</option>
+                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                    <option value="Operating Systems">Operating Systems</option>
+                    <option value="Database Management">Database Management</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Networking">Networking</option>
+                    <option value="Distributed Systems">Distributed Systems</option>
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="SkillLevel">Required Level</label>
+                <select id="SkillLevel" name="SkillLevel" required>
+                    <option value="">--Select level--</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn--form">Add Skill</button>
+        </form>
+
+
+        
     </div>
 </section>
+
+@functions {
+    string SkillLevelName(decimal score)
+    {
+        if (score >= 0.85m) return "Expert";
+        if (score >= 0.75m) return "Advanced";
+        if (score >= 0.65m) return "Intermediate";
+        return "Beginner";
+    }
+}

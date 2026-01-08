@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
 using Student_Job_Finder.Models;
+using System.Linq;
+
 
 namespace Student_Job_Finder.Controllers
 {
@@ -80,22 +82,31 @@ namespace Student_Job_Finder.Controllers
         [HttpGet("PostSingle/{postId}")]
         public IActionResult GetJobPost(int postId)
         {
-            string sql = @"SELECT [PostId],
-                [UserId],
-                [PostTitle],
-                [PostContent],
-                [PostCreated],
-                [PostUpdated]
-            FROM JobFinderSchema.Posts
-                WHERE PostId = " + postId.ToString();
+            string postSql = @"SELECT * 
+                       FROM JobFinderSchema.Posts
+                       WHERE PostId = " + postId;
 
-            var post = _dapper.LoadDataSingle<JobPost>(sql);
-
+            var post = _dapper.LoadDataSingle<JobPost>(postSql);
             if (post == null)
                 return NotFound();
 
-            return View("~/Views/JobPosts/JobPost.cshtml", post);
+            string skillsSql = @"SELECT *
+                         FROM JobFinderSchema.JobSkills
+                         WHERE JobPostId = " + postId;
+
+            var skills = _dapper.LoadData<JobSkill>(skillsSql);
+
+            var vm = new JobSkillsViewModel
+            {
+                PostId = post.PostId,
+                PostTitle = post.PostTitle,
+                PostContent = post.PostContent,
+                Skills = skills.ToList()
+            };
+
+            return View("~/Views/JobPosts/JobPost.cshtml", vm);
         }
+
 
         [HttpGet("AddPost")]
         public IActionResult AddPost()
@@ -110,39 +121,63 @@ namespace Student_Job_Finder.Controllers
         public IActionResult EditPost(int postId)
         {
             if (User.FindFirst("userRole")?.Value != "Recruiter")
-                return Unauthorized("Only Recruiters can edit job posts.");
+                return Unauthorized();
 
-            string sql = @"SELECT * FROM JobFinderSchema.Posts WHERE PostId = " + postId;
-            var post = _dapper.LoadDataSingle<JobPost>(sql);
+            string postSql = @"SELECT * FROM JobFinderSchema.Posts WHERE PostId = " + postId;
+            var post = _dapper.LoadDataSingle<JobPost>(postSql);
 
-            return View("~/Views/JobPosts/EditPost.cshtml", post);
+            string skillsSql = @"
+        SELECT JobSkillId, JobPostId, SkillName, SkillScore
+        FROM JobFinderSchema.JobSkills
+        WHERE JobPostId = " + postId;
+
+            var skills = _dapper.LoadData<JobSkill>(skillsSql);
+
+            var vm = new JobSkillsViewModel
+            {
+                PostId = post.PostId,
+                PostTitle = post.PostTitle,
+                PostContent = post.PostContent,
+                Skills = skills.ToList()
+            };
+
+            return View("~/Views/JobPosts/EditPost.cshtml", vm);
         }
+
 
         [HttpPost("AddPost")]
         public IActionResult AddPost(JobPostToAddDto postToAdd)
         {
+            if (User.FindFirst("userRole")?.Value != "Recruiter")
+                return Unauthorized("Only Recruiters can add job posts.");
 
-            if (this.User.FindFirst("userRole")?.Value == "Recruiter")
-            { 
-                string sql = @"
-                INSERT INTO JobFinderSchema.Posts(
-                    [UserId],
-                    [PostTitle],
-                    [PostContent],
-                    [PostCreated],
-                    [PostUpdated]
-                ) VALUES (" + this.User.FindFirst("userId")?.Value
-                + ",'" + postToAdd.PostTitle
-                + "','" + postToAdd.PostContent
-                + "', GETDATE() , GETDATE() )";
-                if(_dapper.ExecuteSql(sql))
-                {
-                    return RedirectToAction("MyPosts", "JobPost");
-                }
-                throw new Exception("Failed to create new post!");
-            }
-            throw new Exception("Only Recruiters can add job posts!");
+            string sql = @"
+        INSERT INTO JobFinderSchema.Posts (
+            UserId,
+            PostTitle,
+            PostContent,
+            PostCreated,
+            PostUpdated
+        )
+        VALUES (
+            " + User.FindFirst("userId")?.Value + @",
+            '" + postToAdd.PostTitle + @"',
+            '" + postToAdd.PostContent + @"',
+            GETDATE(),
+            GETDATE()
+        );
+        SELECT CAST(SCOPE_IDENTITY() as int);
+    ";
+
+            int newPostId = _dapper.LoadDataSingle<int>(sql);
+
+            return RedirectToAction(
+                "EditPost",
+                "JobPost",
+                new { postId = newPostId }
+            );
         }
+
 
 
         [HttpPost("EditPost")]
@@ -180,5 +215,70 @@ namespace Student_Job_Finder.Controllers
             throw new Exception("Failed to delete post!");
 
         }
+
+        [HttpPost("AddJobSkill")]
+        public IActionResult AddJobSkill(JobSkillToAddDto skillToAdd)
+        {
+            if (User.FindFirst("userRole")?.Value != "Recruiter")
+                return Unauthorized();
+
+            decimal skillScore = 0.60m;
+            switch (skillToAdd.SkillLevel)
+            {
+                case "Beginner": skillScore = 0.60m;
+                    break;
+                case "Intermediate": skillScore = 0.65m;
+                    break;
+                case "Advanced":
+                    skillScore = 0.75m;
+                    break;
+                case "Expert":
+                    skillScore = 0.85m;
+                    break;
+                default: throw new Exception("Invalid skill level");
+
+            }
+
+            string sql = @"
+                INSERT INTO JobFinderSchema.JobSkills
+                    (JobPostId, SkillName, SkillScore)
+                VALUES (" +
+                    skillToAdd.JobPostId + ", '" +
+                    skillToAdd.SkillName + "', " +
+                    skillScore.ToString() +
+                ")";
+
+            if (_dapper.ExecuteSql(sql))
+                return RedirectToAction("EditPost", new { postId = skillToAdd.JobPostId });
+
+            throw new Exception("Failed to add job skill");
+        }
+
+
+        [HttpPost("DeleteJobSkill/{jobSkillId}")]
+        public IActionResult DeleteJobSkill(int jobSkillId, int postId)
+        {
+            if (User.FindFirst("userRole")?.Value != "Recruiter")
+                return Unauthorized();
+
+            string sql = @"
+                DELETE FROM JobFinderSchema.JobSkills
+                WHERE JobSkillId = " + jobSkillId +
+                " AND JobPostId = " + postId;
+
+            if (_dapper.ExecuteSql(sql))
+            {
+                return RedirectToAction("EditPost", new { postId });
+            }
+
+            throw new Exception("Failed to delete job skill");
+        }
+
+
+
+
+
+
+
     }
 }
