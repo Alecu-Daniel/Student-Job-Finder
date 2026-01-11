@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Student_Job_Finder.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<StudentSkillService>();
+builder.Services.AddScoped<JobMatchingService>();
 
 
 string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
