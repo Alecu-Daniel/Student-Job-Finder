@@ -12,15 +12,35 @@ else
     <div class="job-posts-list">
 
         <a class="btn btn--form" href="/JobPost/AddPost">Add a post</a>
+
         @foreach (var post in Model)
         {
             <div class="job-post-card">
-                <h3><a href="/JobPost/PostSingle/@post.PostId">@post.PostTitle</a></h3>
-                <p class="post-date">Created: @post.PostCreated.ToString("dd MMM yyyy")</p>
+                <h3>
+                    <a href="/JobPost/PostSingle/@post.PostId">
+                        @post.PostTitle
+                    </a>
+                </h3>
+
+                <p class="job-price">
+                    @post.Price.ToString("0.00") €
+                    / @post.PricePeriod
+                </p>
+
+                <p class="post-date">
+                    Created: @post.PostCreated.ToString("dd MMM yyyy")
+                </p>
+
                 <form method="post" action="/JobPost/DeletePost/@post.PostId">
-                    <button type="submit" class="btn btn--form">Delete this post</button>
+                    <button type="submit" class="btn btn--form">
+                        Delete this post
+                    </button>
                 </form>
-                <a class="btn btn--form" href="/JobPost/EditPost/@post.PostId">Edit this post</a>
+
+                <a class="btn btn--form"
+                   href="/JobPost/EditPost/@post.PostId">
+                    Edit this post
+                </a>
             </div>
         }
     </div>

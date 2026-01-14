@@ -52,6 +52,8 @@ namespace Student_Job_Finder.Controllers
                 [UserId],
                 [PostTitle],
                 [PostContent],
+                [Price],
+                [PricePeriod],
                 [PostCreated],
                 [PostUpdated]
             FROM JobFinderSchema.Posts
@@ -101,6 +103,8 @@ namespace Student_Job_Finder.Controllers
                 PostId = post.PostId,
                 PostTitle = post.PostTitle,
                 PostContent = post.PostContent,
+                Price = post.Price,
+                PricePeriod = post.PricePeriod,
                 Skills = skills.ToList()
             };
 
@@ -138,6 +142,8 @@ namespace Student_Job_Finder.Controllers
                 PostId = post.PostId,
                 PostTitle = post.PostTitle,
                 PostContent = post.PostContent,
+                Price = post.Price,
+                PricePeriod = post.PricePeriod,
                 Skills = skills.ToList()
             };
 
@@ -152,31 +158,32 @@ namespace Student_Job_Finder.Controllers
                 return Unauthorized("Only Recruiters can add job posts.");
 
             string sql = @"
-        INSERT INTO JobFinderSchema.Posts (
-            UserId,
-            PostTitle,
-            PostContent,
-            PostCreated,
-            PostUpdated
-        )
-        VALUES (
-            " + User.FindFirst("userId")?.Value + @",
-            '" + postToAdd.PostTitle + @"',
-            '" + postToAdd.PostContent + @"',
-            GETDATE(),
-            GETDATE()
-        );
-        SELECT CAST(SCOPE_IDENTITY() as int);
-    ";
+            INSERT INTO JobFinderSchema.Posts (
+                UserId,
+                PostTitle,
+                PostContent,
+                Price,
+                PricePeriod,
+                PostCreated,
+                PostUpdated
+            )
+            VALUES (
+                " + User.FindFirst("userId")?.Value + @",
+                '" + postToAdd.PostTitle + @"',
+                '" + postToAdd.PostContent + @"',
+                " + postToAdd.Price.ToString() + @",
+                '" + postToAdd.PricePeriod + @"',
+                GETDATE(),
+                GETDATE()
+            );
+            SELECT CAST(SCOPE_IDENTITY() as int);
+            ";
 
             int newPostId = _dapper.LoadDataSingle<int>(sql);
 
-            return RedirectToAction(
-                "EditPost",
-                "JobPost",
-                new { postId = newPostId }
-            );
+            return RedirectToAction("EditPost", "JobPost", new { postId = newPostId });
         }
+
 
 
 
@@ -187,6 +194,8 @@ namespace Student_Job_Finder.Controllers
             UPDATE JobFinderSchema.Posts
                 SET PostContent = '" + postToEdit.PostContent +
                 "', PostTitle = '" + postToEdit.PostTitle +
+                "', Price = " + postToEdit.Price +
+                ", PricePeriod = '" + postToEdit.PricePeriod +
                 @"', PostUpdated = GETDATE()
                     WHERE PostId = " + postToEdit.PostId.ToString() +
                     "AND UserId = " + this.User.FindFirst("userId")?.Value;

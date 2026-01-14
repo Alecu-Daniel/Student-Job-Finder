@@ -18,6 +18,18 @@
                 <textarea id="PostContent" name="PostContent" rows="6" required>@Model.PostContent</textarea>
             </div>
 
+            <div class="form-group">
+                <label>Salary</label>
+                <input type="number" step="0.01" name="Price" value = @Model.Price required />
+            </div>
+
+            <div class="form-group">
+                <select name="PricePeriod" required>
+                    <option value="Hour" @(Model.PricePeriod == "Hour" ? "selected" : "")>Per hour</option>
+                    <option value="Month" @(Model.PricePeriod == "Month" ? "selected" : "")>Per month</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn btn--form">Save Changes</button>
         </form>
 

@@ -15,6 +15,8 @@ namespace Student_Job_Finder.Services
             return ratedValues.Average();
         }
 
+        //if you are overqualified for a skill get most score
+
         public static decimal ComputeCosineSimilarity(List<decimal> row1, List<decimal> row2)
         {
             if (row1.Count != row2.Count)
