@@ -25,7 +25,14 @@
                 </li>
             }
         </ul>
+
+       
     }
+
+    <p class="job-price">
+        @Model.Price.ToString("0.00") €
+        / @Model.PricePeriod
+    </p>
 
     @if(role == "Recruiter")
     {
