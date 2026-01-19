@@ -6,47 +6,55 @@ namespace Student_Job_Finder.Services
 {
     public class JobMatchingService
     {
-        private const decimal NOT_RATED = -1m;
-
-        public static decimal ComputeRowMean(List<decimal> row)
+        public static decimal ComputeJobMatchScore(
+            List<decimal> studentSkills,
+            List<decimal> jobRequiredSkills
+        )
         {
-            var ratedValues = row.Where(r => r != NOT_RATED).ToList();
-            if (!ratedValues.Any()) return 0m;
-            return ratedValues.Average();
-        }
+            if (studentSkills.Count != jobRequiredSkills.Count)
+                throw new ArgumentException("Vectors must have the same length");
 
-        //if you are overqualified for a skill get most score
+            decimal totalScore = 0m;
+            int requiredSkillCount = 0;
 
-        public static decimal ComputeCosineSimilarity(List<decimal> row1, List<decimal> row2)
-        {
-            if (row1.Count != row2.Count)
-                throw new ArgumentException("Rows must have the same length");
-
-            decimal mean1 = ComputeRowMean(row1);
-            decimal mean2 = ComputeRowMean(row2);
-
-            decimal numerator = 0m;
-            decimal denom1 = 0m;
-            decimal denom2 = 0m;
-
-            for (int i = 0; i < row1.Count; i++)
+            for (int i = 0; i < jobRequiredSkills.Count; i++)
             {
-                if (row1[i] != NOT_RATED && row2[i] != NOT_RATED)
-                {
-                    decimal diff1 = row1[i] - mean1;
-                    decimal diff2 = row2[i] - mean2;
+                decimal required = jobRequiredSkills[i];
+                decimal student = studentSkills[i];
 
-                    numerator += diff1 * diff2;
-                    denom1 += diff1 * diff1;
-                    denom2 += diff2 * diff2;
+                if (required <= 0m)
+                    continue;
+
+                requiredSkillCount++;
+
+                if (student >= required)
+                {
+                    totalScore += 1m;
                 }
+                else if (student > 0m)
+                {
+                    totalScore += student / required;
+                }
+
             }
 
-            decimal denominator = (decimal)Math.Sqrt((double)denom1) * (decimal)Math.Sqrt((double)denom2);
+            if (requiredSkillCount == 0)
+                return 0m;
 
-            if (denominator == 0m) return 0m;
+            return totalScore / requiredSkillCount;
+        }
 
-            return numerator / denominator;
+        public static decimal NormalizePrice(decimal price, string pricePeriod)
+        {
+            decimal workedHoursPerMonth = 160m;
+
+            if (pricePeriod == "Month")
+                return price;
+
+            if (pricePeriod == "Hour")
+                return price * workedHoursPerMonth;
+
+            return 0m;
         }
     }
 }

@@ -109,11 +109,11 @@ namespace Student_Job_Finder.Controllers
             for (int i = 0; i < jobs.Count(); i++)
             {
                 var jobVector = matrix[i];
-                decimal similarity = JobMatchingService.ComputeCosineSimilarity(studentVector, jobVector);
+                decimal similarity = JobMatchingService.ComputeJobMatchScore(studentVector,jobVector);
                 similarityScores.Add(similarity);
             }
 
-            // Pair jobs with similarity and sort descending
+            
             List<(JobPost Job, decimal Similarity)> results = new List<(JobPost, decimal)>();
             for (int i = 0; i < jobs.Count(); i++)
             {
@@ -122,7 +122,17 @@ namespace Student_Job_Finder.Controllers
 
             // If two jobs have the same similarity sort by the one that give the most pay
 
-            results.Sort((a, b) => b.Similarity.CompareTo(a.Similarity));
+            results.Sort((a, b) =>
+            {
+                int similarityCompare = b.Similarity.CompareTo(a.Similarity);
+                if (similarityCompare != 0)
+                    return similarityCompare;
+
+                decimal payA = JobMatchingService.NormalizePrice(a.Job.Price, a.Job.PricePeriod);
+                decimal payB = JobMatchingService.NormalizePrice(b.Job.Price, b.Job.PricePeriod);
+
+                return payB.CompareTo(payA);
+            });
 
             //Make filters for: Skill , Pay , Match(reset)
 
