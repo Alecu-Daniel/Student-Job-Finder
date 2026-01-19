@@ -1,0 +1,69 @@
+﻿/* wwwroot/css/matched-jobs.css */
+
+.matched-jobs-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.job-post-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+    .job-post-card h3 {
+        margin-top: 0;
+    }
+
+    .job-post-card p {
+        margin: 0.5rem 0;
+    }
+
+    .job-post-card a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        .job-post-card a:hover {
+            text-decoration: underline;
+        }
+
+.underqualified-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.underqualified-skill-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.skill-info-container {
+    display: flex;
+    align-items: center;
+}
+/* Skill color classes */
+.skill-beginner {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.skill-intermediate {
+    color: #e67e22;
+    font-weight: 600;
+}
+
+.skill-advanced {
+    color: #f1c40f;
+    font-weight: 600;
+}
+
+.skill-expert {
+    color: #2ecc71;
+    font-weight: 600;
+}
+

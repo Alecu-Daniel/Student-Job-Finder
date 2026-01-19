@@ -1,10 +1,5 @@
-﻿@model List<(Student_Job_Finder.Models.JobPost Job, decimal Similarity)>
-
-@{
-    ViewData["Title"] = "Matched Jobs";
-}
-
-<h2>Job Matches</h2>
+﻿@using Student_Job_Finder.Models
+@model List<JobMatchResultViewModel>
 
 @if (!Model.Any())
 {
@@ -30,41 +25,42 @@ else
                     </small>
                 </p>
                 <p><strong>Match Score:</strong> @((result.Similarity * 100).ToString("0.##"))%</p>
+
+                @if (result.UnderqualifiedSkills.Any())
+                {
+                    <div class="underqualified-skills">
+                        <strong>Skills you are underqualified for:</strong>
+                        <ul>
+                            @foreach (var skill in result.UnderqualifiedSkills)
+                            {
+                                <li class="underqualified-container">
+                                    <p class="underqualified-skill-name">@skill.SkillName:</p>
+                                    <span class="skill-info-container">Required: <p class="@SkillColorClass(skill.RequiredLevel)">@SkillLevel(skill.RequiredLevel)</p></span>
+                                    <span class="skill-info-container">Yours: <p class="@SkillColorClass(skill.StudentLevel)">@SkillLevel(skill.StudentLevel)</p></span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
             </div>
         }
     </div>
 }
 
-<style>
-    .matched-jobs-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
+@functions {
+    string SkillLevel(decimal score)
+    {
+        if (score >= 0.85m) return "Expert";
+        if (score >= 0.75m) return "Advanced";
+        if (score >= 0.65m) return "Intermediate";
+        return "Beginner";
     }
 
-    .job-post-card {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 1rem;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    string SkillColorClass(decimal score)
+    {
+        if (score >= 0.85m) return "skill-expert";
+        if (score >= 0.75m) return "skill-advanced";
+        if (score >= 0.65m) return "skill-intermediate";
+        return "skill-beginner";
     }
-
-    .job-post-card h3 {
-        margin-top: 0;
-    }
-
-    .job-post-card p {
-        margin: 0.5rem 0;
-    }
-
-    .job-post-card a {
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .job-post-card a:hover {
-        text-decoration: underline;
-    }
-</style>
+}

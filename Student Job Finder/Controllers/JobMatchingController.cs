@@ -113,12 +113,38 @@ namespace Student_Job_Finder.Controllers
                 similarityScores.Add(similarity);
             }
 
-            
-            List<(JobPost Job, decimal Similarity)> results = new List<(JobPost, decimal)>();
-            for (int i = 0; i < jobs.Count(); i++)
+
+            List<JobMatchResultViewModel> results = new();
+
+            for (int i = 0; i < jobs.Count; i++)
             {
-                results.Add((jobs[i], similarityScores[i]));
+                var jobVector = matrix[i];
+                var underqualified = new List<UnderqualifiedSkillViewModel>();
+
+                for (int s = 0; s < allSkills.Count; s++)
+                {
+                    decimal required = jobVector[s];
+                    decimal student = studentVector[s];
+
+                    if (required > 0m && student < required)
+                    {
+                        underqualified.Add(new UnderqualifiedSkillViewModel
+                        {
+                            SkillName = allSkills[s],
+                            RequiredLevel = required,
+                            StudentLevel = student
+                        });
+                    }
+                }
+
+                results.Add(new JobMatchResultViewModel
+                {
+                    Job = jobs[i],
+                    Similarity = similarityScores[i],
+                    UnderqualifiedSkills = underqualified
+                });
             }
+
 
             // If two jobs have the same similarity sort by the one that give the most pay
 
