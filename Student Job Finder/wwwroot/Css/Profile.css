@@ -1,4 +1,14 @@
-﻿.skills-list {
+﻿
+.profile-skills-container{
+    display:flex;
+    gap:10rem;
+    justify-content:center;
+    align-items:center;
+}
+
+
+
+.skills-list {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -10,18 +20,21 @@
 
 .skill-card {
     display: flex;
-    align-items: center;
-    width: 300px;
+    align-items: stretch;
+    width: 30rem;
     border-radius: 12px;
     overflow: hidden;
     background-color: #fff;
+    padding: 0.5rem 0;
     border: 1px solid #ddd;
 }
 
 
 .skill-color-bar {
     width: 8px;
-    height: 100%;
+    align-self: stretch;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
 }
 
 
@@ -43,19 +56,19 @@
     }
 
 
-.skill-beginner .skill-color-bar {
+.skill-color-bar.skill-beginner {
     background-color: #e74c3c;
 }
 
-.skill-intermediate .skill-color-bar {
+.skill-color-bar.skill-intermediate {
     background-color: #e67e22;
 }
 
-.skill-advanced .skill-color-bar {
+.skill-color-bar.skill-advanced {
     background-color: #f1c40f;
 }
 
-.skill-expert .skill-color-bar {
+.skill-color-bar.skill-expert {
     background-color: #2ecc71;
 }
 
@@ -77,6 +90,11 @@
 
 .skill-level.skill-expert {
     color: #2ecc71;
+    font-weight: 600;
+}
+
+.skill-color-bar.potential-jobs-color {
+    background-color: #1971c2;
     font-weight: 600;
 }
 
