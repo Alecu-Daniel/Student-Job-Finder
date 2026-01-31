@@ -2,6 +2,7 @@
 {
     public class StudentSkillsViewModel
     {
-        public List<StudentSkill> Skills { get; set; } = new();
+        public List<StudentSkill> StudentSkills { get; set; } = new();
+        public Dictionary<string,int> PotentialJobs { get; set; } = new();
     }
 }

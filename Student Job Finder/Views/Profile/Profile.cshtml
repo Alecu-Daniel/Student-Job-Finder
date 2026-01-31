@@ -18,28 +18,47 @@
     }
 }
 
-@if (Model.Skills.Count == 0)
+@if (Model.StudentSkills.Count == 0)
 {
     <p>You have no skills yet.</p>
 }
 else
 {
-    <div class="skills-list">
-        @foreach (var skill in Model.Skills)
-        {
-            <div class="skill-card @SkillColorClass(skill.SkillScore)">
-                <div class="skill-color-bar"></div>
-                <div class="skill-card-content">
-                    <h3>@skill.SkillName</h3>
-                    <p>Level: <span class="skill-level @SkillColorClass(skill.SkillScore)">@SkillLevel(skill.SkillScore)</span></p>
-                </div>
+    <div class="container">
+        <div class="profile-skills-container">
+
+            <div class="skills-list">
+                @foreach (var skill in Model.StudentSkills)
+                {
+                    <div class="skill-card">
+                        <div class="skill-color-bar @SkillColorClass(skill.SkillScore)"></div>
+                        <div class="skill-card-content">
+                            <h3>@skill.SkillName</h3>
+                            <p>Level: <span class="skill-level @SkillColorClass(skill.SkillScore)">@SkillLevel(skill.SkillScore)</span></p>
+                        </div>
+                    </div>
+                }
             </div>
-        }
+
+
+            <div class="skills-list">
+                @foreach(var job in Model.PotentialJobs)
+                {
+                    <div class="skill-card">
+                        <div class="skill-color-bar potential-jobs-color"></div>
+                            <div class="skill-card-content">
+                                <h3>@job.Key</h3>
+                                <p>Potential Jobs: @job.Value </p>
+                            </div>
+                     </div>
+                }
+            </div>
+        </div>
     </div>
 }
 
 <div class="pdf-upload-section">
-    @if (Model.Skills.Count == 0)
+    @if (Model.StudentSkills.Count == 0)
     {
         <h3 class="pdf-text-heading">Upload a PDF to Extract Skills</h3>
     }

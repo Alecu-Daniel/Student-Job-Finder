@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
 using Student_Job_Finder.Models;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Student_Job_Finder.Controllers
 {
@@ -16,6 +17,23 @@ namespace Student_Job_Finder.Controllers
         public StudentSkillController(IConfiguration config)
         {
             _dapper = new DataContextDapper(config);
+        }
+
+
+        public enum SkillLevel
+        {
+            Beginner = 0,
+            Intermediate = 1,
+            Advanced = 2,
+            Expert = 3
+        }
+
+        SkillLevel GetSkillLevel(decimal score)
+        {
+            if (score >= 0.85m) return SkillLevel.Expert;
+            if (score >= 0.75m) return SkillLevel.Advanced;
+            if (score >= 0.65m) return SkillLevel.Intermediate;
+            return SkillLevel.Beginner;
         }
 
 
@@ -46,7 +64,7 @@ namespace Student_Job_Finder.Controllers
         [HttpGet("MySkills")]
         public  IActionResult MySkills()
         {
-            string sql = @"
+            string studentSql = @"
                 SELECT [StudentSkillId],
                     [StudentId],
                     [SkillName],
@@ -54,11 +72,55 @@ namespace Student_Job_Finder.Controllers
                     FROM JobFinderSchema.StudentSkills
                 WHERE StudentId = " + this.User.FindFirst("userId").Value;
 
-            var skills = _dapper.LoadData<StudentSkill>(sql);
+            var studentSkills = _dapper.LoadData<StudentSkill>(studentSql);
+
+            string jobSql = @"
+                SELECT [JobSkillId],
+                       [JobPostId],
+                       [SkillName],
+                       [SkillScore]
+                FROM JobFinderSchema.JobSkills";
+
+            var jobSkills = _dapper.LoadData<StudentSkill>(jobSql);
+
+
+            Dictionary<string, int> potentialJobsWithImprovement = new Dictionary<string, int>();
+
+
+            foreach (var skill in studentSkills)
+            {
+
+                SkillLevel studentLevel = GetSkillLevel(skill.SkillScore);
+
+                foreach (var job in jobSkills)
+                {
+                    if( skill.SkillName == job.SkillName)
+                    {
+                        SkillLevel jobLevel = GetSkillLevel(job.SkillScore);
+
+                        if(jobLevel == studentLevel + 1)
+                        {
+                            if (potentialJobsWithImprovement.ContainsKey(skill.SkillName))
+                            {
+                                potentialJobsWithImprovement[skill.SkillName]++;
+                            }
+                            else
+                            {
+                                potentialJobsWithImprovement.Add(skill.SkillName, 1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
 
             var vm = new StudentSkillsViewModel
             {
-                Skills = skills.ToList()
+                StudentSkills = studentSkills.ToList(),
+                PotentialJobs = potentialJobsWithImprovement
             };
 
             return View("~/Views/Profile/Profile.cshtml", vm);
