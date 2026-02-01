@@ -1,4 +1,5 @@
 ﻿@using Student_Job_Finder.Models
+@using Student_Job_Finder.Helpers
 @model List<JobMatchResultViewModel>
 
 @if (!Model.Any())
@@ -35,8 +36,8 @@ else
                             {
                                 <li class="underqualified-container">
                                     <p class="underqualified-skill-name">@skill.SkillName:</p>
-                                    <span class="skill-info-container">Required: <p class="@SkillColorClass(skill.RequiredLevel)">@SkillLevel(skill.RequiredLevel)</p></span>
-                                    <span class="skill-info-container">Yours: <p class="@SkillColorClass(skill.StudentLevel)">@SkillLevel(skill.StudentLevel)</p></span>
+                                    <span class="skill-info-container">Required: <p class="@SkillHelper.SkillColorClass(skill.RequiredLevel)">@SkillHelper.SkillLevelName(skill.RequiredLevel)</p></span>
+                                    <span class="skill-info-container">Yours: <p class="@SkillHelper.SkillColorClass(skill.StudentLevel)">@SkillHelper.SkillLevelName(skill.StudentLevel)</p></span>
                                 </li>
                             }
                         </ul>
@@ -45,22 +46,4 @@ else
             </div>
         }
     </div>
-}
-
-@functions {
-    string SkillLevel(decimal score)
-    {
-        if (score >= 0.85m) return "Expert";
-        if (score >= 0.75m) return "Advanced";
-        if (score >= 0.65m) return "Intermediate";
-        return "Beginner";
-    }
-
-    string SkillColorClass(decimal score)
-    {
-        if (score >= 0.85m) return "skill-expert";
-        if (score >= 0.75m) return "skill-advanced";
-        if (score >= 0.65m) return "skill-intermediate";
-        return "skill-beginner";
-    }
 }

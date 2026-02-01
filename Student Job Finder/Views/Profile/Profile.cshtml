@@ -1,22 +1,5 @@
-﻿@model Student_Job_Finder.Models.StudentSkillsViewModel
-
-@functions {
-    string SkillLevel(decimal score)
-    {
-        if (score >= 0.85m) return "Expert";
-        if (score >= 0.75m) return "Advanced";
-        if (score >= 0.65m) return "Intermediate";
-        return "Beginner";
-    }
-
-    string SkillColorClass(decimal score)
-    {
-        if (score >= 0.85m) return "skill-expert";
-        if (score >= 0.75m) return "skill-advanced";
-        if (score >= 0.65m) return "skill-intermediate";
-        return "skill-beginner";
-    }
-}
+﻿@using Student_Job_Finder.Helpers
+@model Student_Job_Finder.Models.StudentSkillsViewModel 
 
 @if (Model.StudentSkills.Count == 0)
 {
@@ -31,10 +14,10 @@ else
                 @foreach (var skill in Model.StudentSkills)
                 {
                     <div class="skill-card">
-                        <div class="skill-color-bar @SkillColorClass(skill.SkillScore)"></div>
+                        <div class="skill-color-bar @SkillHelper.SkillColorClass(skill.SkillScore)"></div>
                         <div class="skill-card-content">
                             <h3>@skill.SkillName</h3>
-                            <p>Level: <span class="skill-level @SkillColorClass(skill.SkillScore)">@SkillLevel(skill.SkillScore)</span></p>
+                            <p>Level: <span class="skill-level @SkillHelper.SkillColorClass(skill.SkillScore)">@SkillHelper.SkillLevelName(skill.SkillScore)</span></p>
                         </div>
                     </div>
                 }
