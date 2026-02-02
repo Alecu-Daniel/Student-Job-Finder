@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Models;
 using Student_Job_Finder.Services;
+using Student_Job_Finder.Helpers;
 
 namespace Student_Job_Finder.Controllers
 {
@@ -19,23 +20,8 @@ namespace Student_Job_Finder.Controllers
             _dapper = new DataContextDapper(config);
         }
 
-        private readonly List<string> allSkills = new List<string>
-        {
-            "Software Development",
-            "Algorithms and Data Structures",
-            "Computer Architecture",
-            "Artificial Intelligence",
-            "Operating Systems",
-            "Database Management",
-            "Web Development",
-            "Networking",
-            "Distributed Systems"
-        };
-
-
-
         [HttpGet("MatchJobs")]
-        public IActionResult MatchJobsForStudent()
+        public IActionResult MatchJobsForStudent(string? filterBy = "Match", string? skillFilter = null)
         {
             if (User.FindFirst("userRole")?.Value != "Student")
                 return Unauthorized("Only students can use job matching.");
@@ -59,7 +45,7 @@ namespace Student_Job_Finder.Controllers
             {
                 List<decimal> jobRow = new List<decimal>();
 
-                foreach (var skillName in allSkills)
+                foreach (var skillName in SkillHelper.allSkills)
                 {
                     JobSkill? foundSkill = null;
 
@@ -84,7 +70,7 @@ namespace Student_Job_Finder.Controllers
             }
 
             List<decimal> studentVector = new List<decimal>();
-            foreach (var skillName in allSkills)
+            foreach (var skillName in SkillHelper.allSkills)
             {
                 StudentSkill? foundSkill = null;
 
@@ -121,7 +107,7 @@ namespace Student_Job_Finder.Controllers
                 var jobVector = matrix[i];
                 var underqualified = new List<UnderqualifiedSkillViewModel>();
 
-                for (int s = 0; s < allSkills.Count; s++)
+                for (int s = 0; s < SkillHelper.allSkills.Count; s++)
                 {
                     decimal required = jobVector[s];
                     decimal student = studentVector[s];
@@ -130,7 +116,7 @@ namespace Student_Job_Finder.Controllers
                     {
                         underqualified.Add(new UnderqualifiedSkillViewModel
                         {
-                            SkillName = allSkills[s],
+                            SkillName = SkillHelper.allSkills[s],
                             RequiredLevel = required,
                             StudentLevel = student
                         });
@@ -141,24 +127,49 @@ namespace Student_Job_Finder.Controllers
                 {
                     Job = jobs[i],
                     Similarity = similarityScores[i],
+                    JobSkills = jobSkills.Where(js => js.JobPostId == jobs[i].PostId).ToList(),
                     UnderqualifiedSkills = underqualified
                 });
             }
 
 
-            // If two jobs have the same similarity sort by the one that give the most pay
-
-            results.Sort((a, b) =>
+            if (!string.IsNullOrEmpty(skillFilter) && filterBy == "Skill")
             {
-                int similarityCompare = b.Similarity.CompareTo(a.Similarity);
-                if (similarityCompare != 0)
-                    return similarityCompare;
+                var withSkill = results
+                    .Where(r => r.JobSkills.Any(js => js.SkillName == skillFilter))
+                    .OrderByDescending(r => r.Similarity)
+                    .ThenByDescending(r =>
+                        JobMatchingService.NormalizePrice(r.Job.Price, r.Job.PricePeriod));
 
-                decimal payA = JobMatchingService.NormalizePrice(a.Job.Price, a.Job.PricePeriod);
-                decimal payB = JobMatchingService.NormalizePrice(b.Job.Price, b.Job.PricePeriod);
+                var withoutSkill = results
+                    .Where(r => !r.JobSkills.Any(js => js.SkillName == skillFilter))
+                    .OrderByDescending(r => r.Similarity)
+                    .ThenByDescending(r =>
+                        JobMatchingService.NormalizePrice(r.Job.Price, r.Job.PricePeriod));
 
-                return payB.CompareTo(payA);
-            });
+                results = withSkill
+                    .Concat(withoutSkill)
+                    .ToList();
+            }
+            else if (filterBy == "Pay")
+            {
+                results = results
+                    .OrderByDescending(r =>
+                        JobMatchingService.NormalizePrice(r.Job.Price, r.Job.PricePeriod))
+                    .ThenByDescending(r => r.Similarity)
+                    .ToList();
+            }
+            else // Match (default)
+            {
+                results = results
+                    .OrderByDescending(r => r.Similarity)
+                    .ThenByDescending(r =>
+                        JobMatchingService.NormalizePrice(r.Job.Price, r.Job.PricePeriod))
+                    .ToList();
+            }
+
+
+            // If two jobs have the same similarity sort by the one that give the most pay
 
             //Make filters for: Skill , Pay , Match(reset)
 

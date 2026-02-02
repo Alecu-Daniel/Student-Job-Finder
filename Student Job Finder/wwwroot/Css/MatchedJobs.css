@@ -1,4 +1,31 @@
-﻿/* wwwroot/css/matched-jobs.css */
+﻿.job-filter-bar {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .filter-group label {
+        font-size: 0.85rem;
+        color: #555;
+        margin-bottom: 0.25rem;
+    }
+
+    .filter-group select {
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+
+
+
 
 .matched-jobs-list {
     display: grid;

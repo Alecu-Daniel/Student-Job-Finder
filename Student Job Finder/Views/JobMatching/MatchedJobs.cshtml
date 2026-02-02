@@ -2,12 +2,51 @@
 @using Student_Job_Finder.Helpers
 @model List<JobMatchResultViewModel>
 
+@{
+    string selectedFilter = Context.Request.Query["filterBy"];
+    string selectedSkill = Context.Request.Query["skillFilter"];
+}
+
+
+
 @if (!Model.Any())
 {
     <p>No jobs found for your skills.</p>
 }
 else
 {
+
+    <form method="get" action="/JobMatching/MatchJobs" class="job-filter-bar">
+
+        <div class="filter-group">
+            <label for="filterBy">Sort by</label>
+            <select name="filterBy" id="filterBy">
+                <option value="Match" @(selectedFilter == "Match" ? "selected" : "")>Best match</option>
+                <option value="Pay" @(selectedFilter == "Pay" ? "selected" : "")>Highest pay</option>
+                <option value="Skill" @(selectedFilter == "Skill" ? "selected" : "")>Skill relevance</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="skill">Skill</label>
+            <select name="skillFilter" id="skill">
+                <option value="">-- Any skill --</option>
+
+                @foreach (var skill in SkillHelper.allSkills)
+                {
+                    <option value="@skill" @(selectedSkill == skill ? "selected" : "")>
+                        @skill
+                    </option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn--form">
+            Apply filters
+        </button>
+
+    </form>
+
     <div class="matched-jobs-list">
         @foreach (var result in Model)
         {

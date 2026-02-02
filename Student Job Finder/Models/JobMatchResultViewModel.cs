@@ -4,6 +4,7 @@
     {
         public JobPost Job { get; set; } = null!;
         public decimal Similarity { get; set; }
+        public List<JobSkill> JobSkills { get; set; } = new();
         public List<UnderqualifiedSkillViewModel> UnderqualifiedSkills { get; set; } = new();
     }
 }
