@@ -1,0 +1,43 @@
+﻿@model List<Student_Job_Finder.Models.JobApplicationViewModel>
+
+@using Student_Job_Finder.Helpers
+
+<h2>Job Applications</h2>
+
+@if (!Model.Any())
+{
+    <p>No applications yet for this job post.</p>
+}
+else
+{
+    <div class="applications-list">
+        @foreach (var app in Model)
+        {
+            <div class="application-card">
+                <h3>@app.FirstName @app.LastName</h3>
+                <p class="email">@app.Email</p>
+
+                <h4>Student Skills</h4>
+
+                @if (app.StudentSkills.Any())
+                {
+                    <ul class="skills-list">
+                        @foreach (var skill in app.StudentSkills)
+                        {
+                            <li class="skill-item">
+                                <span class="skill-name">@skill.SkillName</span>
+                                <span class="skill-level @SkillHelper.SkillColorClass(skill.SkillScore)">
+                                    @SkillHelper.SkillLevelName(skill.SkillScore)
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="muted">No skills listed.</p>
+                }
+            </div>
+        }
+    </div>
+}
