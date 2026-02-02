@@ -10,6 +10,19 @@
 
     public class SkillHelper
     {
+
+        public static readonly List<string> allSkills = new List<string>
+        {
+            "Software Development",
+            "Algorithms and Data Structures",
+            "Computer Architecture",
+            "Artificial Intelligence",
+            "Operating Systems",
+            "Database Management",
+            "Web Development",
+            "Networking",
+            "Distributed Systems"
+        };
         public static SkillLevel GetSkillLevel(decimal score)
         {
             if (score >= 0.85m) return SkillLevel.Expert;
