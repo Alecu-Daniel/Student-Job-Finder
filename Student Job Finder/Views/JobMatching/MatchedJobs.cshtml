@@ -43,6 +43,14 @@ else
                         </ul>
                     </div>
                 }
+
+                <form method="post" action="/JobApplication/Apply">
+                    <input type="hidden" name="JobPostId" value="@result.Job.PostId" />
+                    <button type="submit" class="btn btn--form">
+                        Apply
+                    </button>
+                </form>
+
             </div>
         }
     </div>
