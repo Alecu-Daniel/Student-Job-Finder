@@ -1,9 +1,30 @@
-﻿.job-filter-bar {
+﻿.job-filter-container{
+    padding: 2rem 0 2rem 3rem;
+}
+
+.job-filter-label {
+    font-size: 2rem;
+    color: #555;
+    margin-bottom: 0.25rem;
+}
+
+.job-filter-select {
+    padding: 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 2rem;
+}
+
+.job-filter-bar {
     display: flex;
     gap: 1rem;
-    align-items: flex-end;
+    align-items: center;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
+}
+
+.job-filter-btn{
+    align-self: end;
 }
 
 .filter-group {
@@ -11,53 +32,119 @@
     flex-direction: column;
 }
 
-    .filter-group label {
-        font-size: 0.85rem;
-        color: #555;
-        margin-bottom: 0.25rem;
-    }
-
-    .filter-group select {
-        padding: 0.4rem 0.6rem;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-
-
-
-
-
 .matched-jobs-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem;
+
+    padding: 0 3rem;
     margin-top: 1rem;
+    align-items: stretch;
+    transition: grid-template-rows 0.4s ease-in-out;
 }
 
-.job-post-card {
+.job-match-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 40rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 1rem;
     background-color: #f9f9f9;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    height: 100%;
 }
 
-    .job-post-card h3 {
-        margin-top: 0;
-    }
+.job-match-card.is-expanded {
+        grid-row: span 2;
+        align-self: start;
+        
+}
 
-    .job-post-card p {
+.job-post-title {
+    display: block;
+
+    font-size: 2.4rem;
+    font-weight: bold;
+    text-decoration: none;
+
+    justify-self: center;
+
+    margin-bottom: 2rem;
+
+}
+
+.job-post-content {
+    font-size: 1.8rem;
+    line-height: 1.5;
+
+    max-height: 10rem;
+    overflow: hidden;
+    overflow-wrap: break-word;
+
+    margin-bottom: 10rem;
+}
+
+
+.job-post-info-container{
+    display:flex;
+    align-content:center;
+    justify-content: space-between;
+
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.job-post-price{
+    font-size: 2rem;
+}
+
+.job-post-match-score{
+    font-size: 2rem;
+}
+
+.job-post-date{
+    font-size: 1.8rem;
+    justify-self: center;
+
+    margin-bottom: 6rem;
+}
+
+.job-match-card h3 {
+    margin-top: 0;
+}
+
+    .job-match-card p {
         margin: 0.5rem 0;
     }
 
-    .job-post-card a {
+    .job-match-card a {
         color: #007bff;
         text-decoration: none;
     }
 
-        .job-post-card a:hover {
+        .job-match-card a:hover {
             text-decoration: underline;
         }
+
+.underqualified-skills{
+    display:none;
+}
+
+.underqualified-skills.is-open {
+        display: block;
+        margin-top: 4rem;
+        font-size: 1.6rem;
+}
+
+
+
+.underqualified-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
 
 .underqualified-container {
     display: flex;
@@ -65,7 +152,7 @@
 }
 
 .underqualified-skill-name {
-    font-size: 1.2rem;
+    font-size: 1.8rem;
     font-weight: 600;
 }
 
@@ -73,6 +160,26 @@
     display: flex;
     align-items: center;
 }
+
+.card-btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    width: 100%;
+}
+
+.btn-chevron-icon {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.chevron-icon {
+    font-size: 3.2rem;
+}
+
+
 /* Skill color classes */
 .skill-beginner {
     color: #e74c3c;
