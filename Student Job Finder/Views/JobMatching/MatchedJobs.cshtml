@@ -8,69 +8,73 @@
 }
 
 
-
 @if (!Model.Any())
 {
     <p>No jobs found for your skills.</p>
 }
 else
 {
+    <div class="job-filter-container">
+        <form method="get" action="/JobMatching/MatchJobs" class="job-filter-bar">
 
-    <form method="get" action="/JobMatching/MatchJobs" class="job-filter-bar">
+            <div class="filter-group">
+                <label class="job-filter-label" for="filterBy" >Sort by</label>
+                <select name="filterBy" id="filterBy" class="job-filter-select">
+                    <option value="Match" @(selectedFilter == "Match" ? "selected" : "")>Best match</option>
+                    <option value="Pay" @(selectedFilter == "Pay" ? "selected" : "")>Highest pay</option>
+                    <option value="Skill" @(selectedFilter == "Skill" ? "selected" : "")>Skill relevance</option>
+                </select>
+            </div>
 
-        <div class="filter-group">
-            <label for="filterBy">Sort by</label>
-            <select name="filterBy" id="filterBy">
-                <option value="Match" @(selectedFilter == "Match" ? "selected" : "")>Best match</option>
-                <option value="Pay" @(selectedFilter == "Pay" ? "selected" : "")>Highest pay</option>
-                <option value="Skill" @(selectedFilter == "Skill" ? "selected" : "")>Skill relevance</option>
-            </select>
-        </div>
+            <div class="filter-group">
+                    <label class="job-filter-label" for="skill">Skill</label>
+                <select name="skillFilter" id="skillFilter" class="job-filter-select">
+                    <option value="">-- Any skill --</option>
 
-        <div class="filter-group">
-            <label for="skill">Skill</label>
-            <select name="skillFilter" id="skill">
-                <option value="">-- Any skill --</option>
+                    @foreach (var skill in SkillHelper.allSkills)
+                    {
+                        <option value="@skill" @(selectedSkill == skill ? "selected" : "")>
+                            @skill
+                        </option>
+                    }
+                </select>
+            </div>
 
-                @foreach (var skill in SkillHelper.allSkills)
-                {
-                    <option value="@skill" @(selectedSkill == skill ? "selected" : "")>
-                        @skill
-                    </option>
-                }
-            </select>
-        </div>
+            <button type="submit" class="btn btn--form job-filter-btn">
+                Apply filters
+            </button>
 
-        <button type="submit" class="btn btn--form">
-            Apply filters
-        </button>
-
-    </form>
+        </form>
+    </div>
 
     <div class="matched-jobs-list">
         @foreach (var result in Model)
         {
-            <div class="job-post-card">
-                <h3>
-                    <a href="/JobPost/PostSingle/@result.Job.PostId">
-                        @result.Job.PostTitle
-                    </a>
-                </h3>
-                <p>@result.Job.PostContent</p>
-                <p>@result.Job.Price € / @result.Job.PricePeriod</p>
-                <p>
+            <div class="job-match-card">
+
+                <a class="job-post-title" href="/JobPost/PostSingle/@result.Job.PostId">
+                      @result.Job.PostTitle
+                </a>
+                
+                <p class="job-post-content">@result.Job.PostContent</p>
+                
+                <div class="job-post-info-container">
+                    <p class="job-post-price">@result.Job.Price € / @result.Job.PricePeriod</p>
+                    <p class="job-post-match-score"><strong>Match Score:</strong> @((result.Similarity * 100).ToString("0.##"))%</p>
+                </div>
+
+                <p class="job-post-date">
                     <small>
-                        Created: @result.Job.PostCreated.ToString("dd MMM yyyy") |
+                        Created: @result.Job.PostCreated.ToString("dd MMM yyyy")
                         Updated: @result.Job.PostUpdated.ToString("dd MMM yyyy")
                     </small>
                 </p>
-                <p><strong>Match Score:</strong> @((result.Similarity * 100).ToString("0.##"))%</p>
 
                 @if (result.UnderqualifiedSkills.Any())
                 {
                     <div class="underqualified-skills">
                         <strong>Skills you are underqualified for:</strong>
-                        <ul>
+                        <ul class="underqualified-list">
                             @foreach (var skill in result.UnderqualifiedSkills)
                             {
                                 <li class="underqualified-container">
@@ -83,14 +87,67 @@ else
                     </div>
                 }
 
-                <form method="post" action="/JobApplication/Apply">
-                    <input type="hidden" name="JobPostId" value="@result.Job.PostId" />
-                    <button type="submit" class="btn btn--form">
-                        Apply
+                <div class="card-btn-container">
+                
+                    <form method="post" action="/JobApplication/Apply">
+                        <input type="hidden" name="JobPostId" value="@result.Job.PostId" />
+                        <button type="submit" class="btn btn--form">
+                            Apply
+                        </button>
+                    </form>
+
+                    <button class="btn-chevron-icon" type="button">
+                        <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
                     </button>
-                </form>
+
+                </div>
 
             </div>
         }
     </div>
 }
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterBy = document.getElementById("filterBy");
+        const skillFilter = document.getElementById("skillFilter");
+
+        skillFilter.addEventListener("change", function () {
+            if (skillFilter.value !== "") {
+                filterBy.value = "Skill";
+            }
+        });
+
+        filterBy.addEventListener("change", function () {
+            if (filterBy.value !== "Skill") {
+                skillFilter.value = "";
+            }
+        });
+    });
+</script>
+
+<script>
+            document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".btn-chevron-icon").forEach(button => {
+            button.addEventListener("click", function () {
+
+                const card = this.closest(".job-match-card");
+                const skills = card.querySelector(".underqualified-skills");
+                const icon = this.querySelector(".chevron-icon");
+
+                if (skills) {
+                    // 1. Toggle the skills visibility
+                    skills.classList.toggle("is-open");
+
+                    // 2. Toggle the grid spanning class on the card
+                    card.classList.toggle("is-expanded");
+
+                    // 3. Update the icon
+                    const isOpen = skills.classList.contains("is-open");
+                    icon.setAttribute("name", isOpen ? "chevron-up-outline" : "chevron-down-outline");
+                }
+            });
+        });
+    });
+</script>
