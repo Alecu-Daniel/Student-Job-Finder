@@ -91,6 +91,7 @@ else
                 
                     <form method="post" action="/JobApplication/Apply">
                         <input type="hidden" name="JobPostId" value="@result.Job.PostId" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
                         <button type="submit" class="btn btn--form">
                             Apply
                         </button>

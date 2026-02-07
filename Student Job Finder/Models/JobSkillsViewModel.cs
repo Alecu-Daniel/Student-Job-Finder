@@ -8,6 +8,7 @@
         public decimal Price { get; set; }
         public string PricePeriod { get; set; } = "";
 
-        public List<JobSkill> Skills { get; set; } = new();
+        public List<JobSkill> PostSkills { get; set; } = new();
+        public List<StudentSkill> StudentSkills { get; set; } = new();
     }
 }

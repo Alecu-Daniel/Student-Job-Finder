@@ -38,13 +38,13 @@
 
         <h3>Add a Job Skill</h3>
 
-        @if (Model.Skills.Any())
+        @if (Model.PostSkills.Any())
         {
             <div class="job-skills-section">
                 <h3>Required Skills</h3>
 
                 <ul class="job-skills-list">
-                    @foreach (var skill in Model.Skills)
+                    @foreach (var skill in Model.PostSkills)
                     {
                         <li class="job-skill-item">
                             <span class="skill-info">

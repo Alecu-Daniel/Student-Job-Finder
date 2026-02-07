@@ -53,7 +53,7 @@ namespace Student_Job_Finder.Controllers
                     [SkillName],
                     [SkillScore]
                     FROM JobFinderSchema.StudentSkills
-                WHERE StudentId = " + this.User.FindFirst("userId").Value;
+                WHERE StudentId = " + this.User.FindFirst("userId")?.Value;
 
             var studentSkills = _dapper.LoadData<StudentSkill>(studentSql);
 

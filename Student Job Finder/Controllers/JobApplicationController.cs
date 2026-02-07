@@ -18,7 +18,7 @@ namespace Student_Job_Finder.Controllers
         }
 
         [HttpPost("Apply")]
-        public IActionResult Apply(JobApplicationToAddDto application)
+        public IActionResult Apply(JobApplicationToAddDto application, string returnUrl)
         {
             if (User.FindFirst("userRole")?.Value != "Student")
             {
@@ -53,7 +53,7 @@ namespace Student_Job_Finder.Controllers
             if (!_dapper.ExecuteSql(insertSql))
                 throw new Exception("Failed to apply to job");
 
-            return RedirectToAction("MatchJobsForStudent", "JobMatching");
+            return LocalRedirect(returnUrl);
         }
 
 

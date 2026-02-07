@@ -92,11 +92,17 @@ namespace Student_Job_Finder.Controllers
             if (post == null)
                 return NotFound();
 
-            string skillsSql = @"SELECT *
+            string postSkillsSql = @"SELECT *
                          FROM JobFinderSchema.JobSkills
                          WHERE JobPostId = " + postId;
 
-            var skills = _dapper.LoadData<JobSkill>(skillsSql);
+            var postSkills = _dapper.LoadData<JobSkill>(postSkillsSql);
+
+            string studentSkillsSql = @"SELECT *
+                         FROM JobFinderSchema.StudentSkills
+                         WHERE StudentId = " + this.User.FindFirst("userId")?.Value;
+
+            var studentSkills = _dapper.LoadData<StudentSkill>(studentSkillsSql);
 
             var vm = new JobSkillsViewModel
             {
@@ -105,7 +111,9 @@ namespace Student_Job_Finder.Controllers
                 PostContent = post.PostContent,
                 Price = post.Price,
                 PricePeriod = post.PricePeriod,
-                Skills = skills.ToList()
+                PostSkills = postSkills.ToList(),
+                StudentSkills = studentSkills.ToList()
+
             };
 
             return View("~/Views/JobPosts/JobPost.cshtml", vm);
@@ -144,7 +152,7 @@ namespace Student_Job_Finder.Controllers
                 PostContent = post.PostContent,
                 Price = post.Price,
                 PricePeriod = post.PricePeriod,
-                Skills = skills.ToList()
+                PostSkills = skills.ToList()
             };
 
             return View("~/Views/JobPosts/EditPost.cshtml", vm);
