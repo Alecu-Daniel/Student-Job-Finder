@@ -1,29 +1,37 @@
 ﻿@model Student_Job_Finder.Dtos.JobPostToAddDto
 
-<h2>Add a Job Post</h2>
 
-<form action="/JobPost/AddPost" method="post">
-    <div class="form-group">
-        <label for="PostTitle">Title</label>
-        <input type="text" name="PostTitle" id="PostTitle" required />
-    </div>
+<div class="container add-post-container">
+    <h2 class="add-post-view-title">Add a Job Post</h2>
+    <form action="/JobPost/AddPost" method="post">
 
-    <div class="form-group">
-        <label for="PostContent">Content</label>
-        <textarea name="PostContent" id="PostContent" rows="5" required></textarea>
-    </div>
 
-    <div class="form-group">
-        <label>Salary</label>
-        <input type="number" step="0.01" name="Price" required />
-    </div>
+            <div class="add-post-input-container">
+                <label for="PostTitle" class="add-post-input-label">Title</label>
+                <input type="text" name="PostTitle" id="PostTitle" required class="add-post-input" />
+            </div>
 
-    <div class="form-group">
-        <select name="PricePeriod" required>
-            <option value="Hour">Per hour</option>
-            <option value="Month">Per month</option>
-        </select>
-    </div>
+            <div class="add-post-salary-container">
+                <div class="add-post-input-container">
+                    <label class="add-post-input-label">Salary</label>
+                    <input type="number" step="0.01" name="Price" required class="add-post-input" />
+                </div>
+                <div class="add-post-input-container">
+                    <label class="add-post-input-label">Pay Period</label>
+                    <select name="PricePeriod" required class="add-post-input">
+                        <option value="Hour">Per hour</option>
+                        <option value="Month">Per month</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="add-post-input-container">
+                <label for="PostContent" class="add-post-input-label">Content</label>
+                <textarea name="PostContent" id="PostContent" rows="5" required class="add-post-input"></textarea>
+            </div>
 
-    <button type="submit">Add Post</button>
-</form>
+
+            <button type="submit" class="btn--form btn">Post & Continue to skills</button>
+    
+    </form>
+</div>
