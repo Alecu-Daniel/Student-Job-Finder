@@ -56,11 +56,11 @@
     height: 100%;
 }
 
-.job-match-card.is-expanded {
+    .job-match-card.is-expanded {
         grid-row: span 2;
         align-self: start;
-        
-}
+        height: 100%;
+    }
 
 .job-post-title {
     display: block;
@@ -78,11 +78,10 @@
 .job-post-content {
     font-size: 1.8rem;
     line-height: 1.5;
-
     max-height: 10rem;
     overflow: hidden;
     overflow-wrap: break-word;
-
+    white-space: pre-wrap;
     margin-bottom: 10rem;
 }
 
@@ -133,9 +132,12 @@
 }
 
 .underqualified-skills.is-open {
-        display: block;
+        display: flex;
+        flex-direction: column;
         margin-top: 4rem;
         font-size: 1.6rem;
+        overflow-y: auto;
+        max-height: 40rem;
 }
 
 
