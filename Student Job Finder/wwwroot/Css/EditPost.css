@@ -1,50 +1,117 @@
-﻿.edit-section {
-    display: flex;
-    justify-content: center;
-    padding: 6rem 2rem;
-    background-color: #fdf2e9;
-}
-
-.edit-container {
-    width: 100%;
-    max-width: 600px;
-    background-color: #fff;
-    padding: 3rem 2rem;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
-
-    .edit-container h2 {
-        text-align: center;
-        margin-bottom: 2.5rem;
-        font-size: 2.4rem;
-        color: #333;
-    }
-
-.form-group {
+﻿.edit-post-container {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1.8rem;
+    margin-top: 2rem;
+    padding: 3rem 3rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    background-color: #fff;
+    /*    background: linear-gradient(90deg,rgba(240, 178, 122, 1) 0%, rgba(243, 193, 149, 1) 69%);*/
 }
 
-    .form-group label {
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        font-size: 1.6rem;
-        color: #333;
-    }
+.edit-post-view-title {
+    font-size: 2.4rem;
+    align-self: center;
+    margin-bottom: 2rem;
+}
 
-    .form-group input,
-    .form-group textarea {
-        padding: 0.8rem 1rem;
-        font-size: 1.6rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        transition: all 0.3s;
-    }
 
-        .form-group input:focus,
-        .form-group textarea:focus {
-            border-color: #cf711f;
-            outline: none;
-        }
+.edit-post-skill-title {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.edit-post-skills-container {
+    
+}
+
+.edit-post-skills-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    list-style: none;
+    margin-top: 2rem;
+}
+
+.edit-post-skill {
+    font-size: 2rem;
+    display: flex;
+    gap: 1rem;
+
+}
+
+.edit-post-skill-info {
+    display: flex;
+    gap: 1rem;
+    font-weight: 500;
+}
+
+.edit-post-skills-select {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+}
+
+.edit-post-skill-delete-btn {
+    background: none;
+    border: none;
+    margin-bottom: 2rem;
+}
+
+.edit-post-skill-delete-icon {
+    color: red;
+    font-size: 2rem;
+}
+
+.edit-post-form-btn {
+    margin-bottom: 2.2rem;
+}
+
+
+.edit-post-input-container {
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.edit-post-input {
+    padding: 0.8rem 1rem;
+    font-size: 1.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+
+.edit-post-input-container-content {
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    min-height: 30rem;
+}
+
+.edit-post-content {
+    padding: 0.8rem 1rem;
+    font-size: 1.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.3s;
+    flex-grow: 1;
+    resize: none;
+}
+.edit-post-salary-container {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+}
+
+.edit-post-input-label {
+    font-size: 2rem;
+    font-weight: 600;
+}
