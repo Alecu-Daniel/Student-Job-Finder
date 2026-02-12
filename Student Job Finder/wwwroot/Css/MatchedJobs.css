@@ -180,24 +180,3 @@
 }
 
 
-/* Skill color classes */
-.skill-beginner {
-    color: #e74c3c;
-    font-weight: 600;
-}
-
-.skill-intermediate {
-    color: #e67e22;
-    font-weight: 600;
-}
-
-.skill-advanced {
-    color: #f1c40f;
-    font-weight: 600;
-}
-
-.skill-expert {
-    color: #2ecc71;
-    font-weight: 600;
-}
-

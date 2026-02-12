@@ -15,6 +15,7 @@ body {
     font-weight: 400;
     color: #555;
     overflow-x: hidden;
+    background-color: #fdf2e9;
 }
 
 /**************************/
@@ -197,4 +198,30 @@ body {
 
 strong {
     font-weight: 500;
+}
+
+/*Skill colors*/
+
+.skill-beginner {
+    /*    color: #e74c3c;*/
+    color: #2ecc71;
+    font-weight: 600;
+}
+
+.skill-intermediate {
+    /*    color: #e67e22;*/
+    color: #4A90E2;
+    font-weight: 600;
+}
+
+.skill-advanced {
+    /*    color: #f1c40f;*/
+    color: #6C3FC9;
+    font-weight: 600;
+}
+
+.skill-expert {
+    /*    color: #2ecc71;*/
+    color: #B22222;
+    font-weight: 600;
 }

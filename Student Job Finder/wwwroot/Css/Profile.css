@@ -57,47 +57,24 @@
 
 
 .skill-color-bar.skill-beginner {
-    background-color: #e74c3c;
-}
-
-.skill-color-bar.skill-intermediate {
-    background-color: #e67e22;
-}
-
-.skill-color-bar.skill-advanced {
-    background-color: #f1c40f;
-}
-
-.skill-color-bar.skill-expert {
     background-color: #2ecc71;
 }
 
-
-.skill-level.skill-beginner {
-    color: #e74c3c;
-    font-weight: 600;
+.skill-color-bar.skill-intermediate {
+    background-color: #4A90E2;
 }
 
-.skill-level.skill-intermediate {
-    color: #e67e22;
-    font-weight: 600;
+.skill-color-bar.skill-advanced {
+    background-color: #6C3FC9;
 }
 
-.skill-level.skill-advanced {
-    color: #f1c40f;
-    font-weight: 600;
-}
-
-.skill-level.skill-expert {
-    color: #2ecc71;
-    font-weight: 600;
+.skill-color-bar.skill-expert {
+    background-color: #B22222;
 }
 
 .skill-color-bar.potential-jobs-color {
-    background-color: #1971c2;
-    font-weight: 600;
+    background-color: #fcc419;
 }
-
 
 .pdf-upload-section {
     display: flex;

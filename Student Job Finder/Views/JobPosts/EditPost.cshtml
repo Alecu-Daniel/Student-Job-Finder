@@ -1,79 +1,52 @@
-﻿@model Student_Job_Finder.Models.JobSkillsViewModel
+﻿@using Student_Job_Finder.Helpers
+@model Student_Job_Finder.Models.JobSkillsViewModel
 
-<section class="edit-section">
-    <div class="edit-container">
-        <h2>Edit Job Post</h2>
+<div class="container edit-post-container">
 
- 
-        <form method="post" action="/JobPost/EditPost">
-            <input type="hidden" name="PostId" value="@Model.PostId" />
-
-            <div class="form-group">
-                <label for="PostTitle">Title</label>
-                <input type="text" id="PostTitle" name="PostTitle" value="@Model.PostTitle" required />
-            </div>
-
-            <div class="form-group">
-                <label for="PostContent">Content</label>
-                <textarea id="PostContent" name="PostContent" rows="6" required>@Model.PostContent</textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Salary</label>
-                <input type="number" step="0.01" name="Price" value = @Model.Price required />
-            </div>
-
-            <div class="form-group">
-                <select name="PricePeriod" required>
-                    <option value="Hour" @(Model.PricePeriod == "Hour" ? "selected" : "")>Per hour</option>
-                    <option value="Month" @(Model.PricePeriod == "Month" ? "selected" : "")>Per month</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn--form">Save Changes</button>
-        </form>
-
-        <hr />
+    <h2 class="edit-post-view-title">Edit Job Post</h2>
 
 
-        <h3>Add a Job Skill</h3>
+    <h3 class="edit-post-skill-title">Required Skills</h3>
 
-        @if (Model.PostSkills.Any())
-        {
-            <div class="job-skills-section">
-                <h3>Required Skills</h3>
+    @if (Model.PostSkills.Any())
+    {
+        <div class="edit-post-skills-container">
 
-                <ul class="job-skills-list">
-                    @foreach (var skill in Model.PostSkills)
-                    {
-                        <li class="job-skill-item">
-                            <span class="skill-info">
-                                <strong>@skill.SkillName</strong>
-                                <span class="skill-level">(@SkillLevelName(skill.SkillScore))</span>
-                            </span>
 
-                            <form method="post"
-                                  action="/JobPost/DeleteJobSkill/@skill.JobSkillId"
-                                  class="skill-delete-form">
-                                <input type="hidden" name="postId" value="@Model.PostId" />
-                                <button type="submit" class="skill-delete-btn" title="Remove skill">
-                                    ×
-                                </button>
-                            </form>
-                        </li>
-                    }
-                </ul>
-            </div>
-        }
+            <ul class="edit-post-skills-list">
+                @foreach (var skill in Model.PostSkills)
+                {
+                    <li class="edit-post-skill">
+                        <div class="edit-post-skill-info">
+                            <p>@skill.SkillName</p>
+                            <p class="@SkillHelper.SkillColorClass(skill.SkillScore)">@SkillHelper.SkillLevelName(skill.SkillScore)</p>
+                        </div>
+
+                        <form method="post"
+                              action="/JobPost/DeleteJobSkill/@skill.JobSkillId" class="skill-delete-form">
+                            <input type="hidden" name="postId" value="@Model.PostId" />
+                            <button type="submit" class="edit-post-skill-delete-btn" title="Remove skill">
+                                <ion-icon name="close-circle-outline" class="edit-post-skill-delete-icon"></ion-icon>
+                            </button>
+                        </form>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
 
 
 
-        <form method="post" action="/JobPost/AddJobSkill">
-            <input type="hidden" name="JobPostId" value="@Model.PostId" />
+    <form method="post" action="/JobPost/AddJobSkill">
+        <input type="hidden" name="JobPostId" value="@Model.PostId" />
 
-            <div class="form-group">
-                <label for="SkillName">Skill</label>
-                <select id="SkillName" name="SkillName" required>
+        <div class="edit-post-skills-select">
+
+            <div class="edit-post-input-container">
+
+                <label for="SkillName" class="edit-post-input-label">Skill</label>
+
+                <select id="SkillName" name="SkillName" required class="edit-post-input">
                     <option value="">--Select a skill--</option>
                     <option value="Software Development">Software Development</option>
                     <option value="Algorithms and Data Structures">Algorithms and Data Structures</option>
@@ -84,13 +57,13 @@
                     <option value="Web Development">Web Development</option>
                     <option value="Networking">Networking</option>
                     <option value="Distributed Systems">Distributed Systems</option>
-
                 </select>
+
             </div>
 
-            <div class="form-group">
-                <label for="SkillLevel">Required Level</label>
-                <select id="SkillLevel" name="SkillLevel" required>
+            <div class="edit-post-input-container">
+                <label for="SkillLevel" class="edit-post-input-label">Required Level</label>
+                <select id="SkillLevel" name="SkillLevel" required class="edit-post-input">
                     <option value="">--Select level--</option>
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
@@ -99,20 +72,45 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn--form">Add Skill</button>
+        </div>
+
+        <button type="submit" class="btn btn--form edit-post-form-btn">Add Skill</button>
+    </form>
+ 
+        <form method="post" action="/JobPost/EditPost">
+            <input type="hidden" name="PostId" value="@Model.PostId" />
+
+            
+
+            <div class="edit-post-input-container">
+                <label for="PostTitle" class="edit-post-input-label">Title</label>
+                <input type="text" id="PostTitle" name="PostTitle" value="@Model.PostTitle" required class="edit-post-input" />
+            </div>
+
+
+            <div class="edit-post-salary-container">
+            
+                <div class="edit-post-input-container">
+                    <label class="edit-post-input-label">Salary</label>
+                    <input type="number" step="0.01" name="Price" value=@Model.Price required class="edit-post-input" />
+                </div>
+
+                <div class="edit-post-input-container">
+                    <label class="edit-post-input-label">Pay Period</label>
+                    <select name="PricePeriod" required class="edit-post-input">
+                        <option value="Hour" @(Model.PricePeriod == "Hour" ? "selected" : "")>Per hour</option>
+                        <option value="Month" @(Model.PricePeriod == "Month" ? "selected" : "")>Per month</option>
+                    </select>
+                </div>
+
+            </div>
+
+                <div class="edit-post-input-container-content">
+                    <label for="PostContent" class="edit-post-input-label">Content</label>
+                    <textarea id="PostContent" name="PostContent" rows="6" required class="edit-post-content">@Model.PostContent</textarea>
+                </div>
+
+            <button type="submit" class="btn btn--form">Save Changes</button>
         </form>
-
-
         
-    </div>
-</section>
-
-@functions {
-    string SkillLevelName(decimal score)
-    {
-        if (score >= 0.85m) return "Expert";
-        if (score >= 0.75m) return "Advanced";
-        if (score >= 0.65m) return "Intermediate";
-        return "Beginner";
-    }
-}
+</div>
