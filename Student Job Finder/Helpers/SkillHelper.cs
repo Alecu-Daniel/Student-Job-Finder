@@ -17,6 +17,7 @@
             "Algorithms and Data Structures",
             "Computer Architecture",
             "Artificial Intelligence",
+            "Computer Graphics",
             "Operating Systems",
             "Database Management",
             "Web Development",

@@ -73,6 +73,12 @@ namespace Student_Job_Finder.Controllers
 
             List<JobApplicationViewModel> results = new();
 
+            string jobPostSkillsSql = @"
+                     SELECT * FROM JobFinderSchema.JobSkills
+                     WHERE JobPostId = " + postId;
+
+            var jobPostSkills = _dapper.LoadData<JobSkill>(jobPostSkillsSql);
+
             foreach (var app in applications)
             {
                 string studentInfoSql = @"
@@ -88,18 +94,21 @@ namespace Student_Job_Finder.Controllers
 
                 var skills = _dapper.LoadData<StudentSkill>(studentSkillSql);
 
+                
+
                 var vm = new JobApplicationViewModel()
                 {
                     FirstName = student.FirstName,
                     LastName = student.LastName,
                     Email = student.Email,
-                    StudentSkills = skills.ToList()
+                    StudentSkills = skills.ToList(),
+                    RequiredSkills = jobPostSkills.ToList()
                 };
 
                 results.Add(vm);
             }
 
-            return View("~/Views/JobPosts/Applications.cshtml",results);
+            return View("~/Views/JobPosts/Applications.cshtml", results.OrderByDescending(x => x.MatchScore).ToList());
         }
 
 

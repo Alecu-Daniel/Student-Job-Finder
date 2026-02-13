@@ -47,16 +47,12 @@
                 <label for="SkillName" class="edit-post-input-label">Skill</label>
 
                 <select id="SkillName" name="SkillName" required class="edit-post-input">
-                    <option value="">--Select a skill--</option>
-                    <option value="Software Development">Software Development</option>
-                    <option value="Algorithms and Data Structures">Algorithms and Data Structures</option>
-                    <option value="Computer Architecture">Computer Architecture</option>
-                    <option value="Artificial Intelligence">Artificial Intelligence</option>
-                    <option value="Operating Systems">Operating Systems</option>
-                    <option value="Database Management">Database Management</option>
-                    <option value="Web Development">Web Development</option>
-                    <option value="Networking">Networking</option>
-                    <option value="Distributed Systems">Distributed Systems</option>
+                    @foreach (var skill in SkillHelper.allSkills)
+                    {
+                        <option value="@skill">
+                            @skill
+                        </option>
+                    }
                 </select>
 
             </div>
