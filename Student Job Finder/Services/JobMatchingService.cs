@@ -17,10 +17,12 @@ namespace Student_Job_Finder.Services
             decimal totalScore = 0m;
             int requiredSkillCount = 0;
 
+            const decimal floor = 0.50m;
+
             for (int i = 0; i < jobRequiredSkills.Count; i++)
             {
-                decimal required = jobRequiredSkills[i];
-                decimal student = studentSkills[i];
+                decimal required = jobRequiredSkills[i] - floor;
+                decimal student = studentSkills[i] - floor;
 
                 if (required <= 0m)
                     continue;

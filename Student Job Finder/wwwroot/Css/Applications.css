@@ -1,8 +1,16 @@
-﻿.applications-list {
+﻿.applications-view-title {
+    font-size: 2.4rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    justify-self: center;
+}
+
+.applications-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+    padding: 0 2rem;
 }
 
 .application-card {
@@ -13,33 +21,110 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-    .application-card h3 {
-        margin: 0 0 0.25rem 0;
-    }
-
-    .application-card .email {
-        font-size: 0.9rem;
-        color: #555;
-        margin-bottom: 0.75rem;
-    }
-
-.skills-list {
-    list-style: none;
-    padding: 0;
-    margin: 0.5rem 0 0 0;
-}
-
-.skill-item {
-    display: flex;
+.application-card-header {
+    display:flex;
     justify-content: space-between;
-    padding: 0.4rem 0;
-    border-bottom: 1px solid #eee;
+    align-items: center;
 }
 
-.skill-name {
+.application-student-info-container {
+    display:flex;
+    flex-direction: column;
+}
+
+.application-student-name {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.application-email {
+    font-size: 2rem;
+    margin-top: 2rem;
+    font-weight: 600;
+}
+
+.application-match-container {
+    display:flex;
+    gap:1rem;
+}
+
+.application-match-label {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.application-match-score {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.application-student-skill-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-top: 2rem;
+}
+
+.application-skills-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin: 2rem 0;
+    border: 1px solid #eee;
+}
+
+.application-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.6rem;
+    color: #666;
+}
+
+    .application-legend-item ion-icon {
+        font-size: 2rem;
+    }
+
+
+
+
+.application-skills-list {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 2rem 5rem;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.application-skill-item {
+    display: contents;
+    font-size: 2rem;
     font-weight: 500;
 }
 
-.skill-level {
-    font-weight: bold;
+application-skill-name, application-skill-level {
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.application-skill-item ion-icon {
+    font-size: 3rem;
+}
+
+.application-less-icon {
+    color: red;
+}
+
+.application-equal-icon {
+    color: dimgrey;
+}
+
+.application-greater-icon {
+    color: lawngreen;
+}
+
+.application-extra-icon {
+    color: #3F51B5;
 }

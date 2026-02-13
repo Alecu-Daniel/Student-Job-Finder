@@ -2,11 +2,11 @@
 
 @using Student_Job_Finder.Helpers
 
-<h2>Job Applications</h2>
+<p class="applications-view-title">Job Applications</p>
 
 @if (!Model.Any())
 {
-    <p>No applications yet for this job post.</p>
+    <p class="applications-view-title">No applications yet for this job post.</p>
 }
 else
 {
@@ -14,28 +14,83 @@ else
         @foreach (var app in Model)
         {
             <div class="application-card">
-                <h3>@app.FirstName @app.LastName</h3>
-                <p class="email">@app.Email</p>
 
-                <h4>Student Skills</h4>
+                <div class="application-card-header">
+                    <div class="application-student-info-container">
+                        <p class="application-student-name">@app.FirstName @app.LastName</p>
+                        <p class="application-email">@app.Email</p>
+                    </div>
+                    <div class="application-match-container">
+                        <span class="application-match-label">Match Score:</span>
+                        <span class="application-match-score">@app.MatchScore.ToString("0.##")%</span>
+                    </div>
+                </div>
+
+                <div class="application-skills-legend">
+                    <div class="application-legend-item">
+                        <ion-icon name="arrow-up-outline" class="application-greater-icon"></ion-icon>
+                        <span>Overqualified</span>
+                    </div>
+                    <div class="application-legend-item">
+                        <ion-icon name="reorder-two-outline" class="application-equal-icon"></ion-icon>
+                        <span>Matches Requirement</span>
+                    </div>
+                    <div class="application-legend-item">
+                        <ion-icon name="arrow-down-outline" class="application-less-icon"></ion-icon>
+                        <span>Underqualified</span>
+                    </div>
+                    <div class="application-legend-item">
+                        <ion-icon name="add-outline" class="application-extra-icon"></ion-icon>
+                        <span>Additional Skill</span>
+                    </div>
+                </div>
+
+                <p class="application-student-skill-title">Student Skills</p>
+                
 
                 @if (app.StudentSkills.Any())
                 {
-                    <ul class="skills-list">
+                    <ul class="application-skills-list">
                         @foreach (var skill in app.StudentSkills)
                         {
-                            <li class="skill-item">
-                                <span class="skill-name">@skill.SkillName</span>
-                                <span class="skill-level @SkillHelper.SkillColorClass(skill.SkillScore)">
+                            <li class="application-skill-item">
+                                <span class="application-skill-name">@skill.SkillName</span>
+                                <span class="application-skill-level @SkillHelper.SkillColorClass(skill.SkillScore)">
                                     @SkillHelper.SkillLevelName(skill.SkillScore)
                                 </span>
+                                
+                                @{
+                                    var matchingRequirement = app.RequiredSkills
+                                    .FirstOrDefault(r => r.SkillName.Equals(skill.SkillName));
+                                }
+
+                                @if (matchingRequirement != null)
+                                {
+                                    @if (SkillHelper.GetSkillLevel(skill.SkillScore) < SkillHelper.GetSkillLevel(matchingRequirement.SkillScore))
+                                    {
+                                        <ion-icon name="arrow-down-outline" class="application-less-icon"></ion-icon>
+                                    }
+                                    else if (SkillHelper.GetSkillLevel(skill.SkillScore) == SkillHelper.GetSkillLevel(matchingRequirement.SkillScore))
+                                    {
+                                        <ion-icon name="reorder-two-outline" class="application-equal-icon"></ion-icon>
+                                    }
+                                    else
+                                    {
+                                        <ion-icon name="arrow-up-outline" class="application-greater-icon"></ion-icon>
+                                    }
+                                }
+                                else
+                                {
+                                    <ion-icon name="add-outline" class="application-extra-icon"></ion-icon>
+                                }
+
                             </li>
                         }
                     </ul>
                 }
                 else
                 {
-                    <p class="muted">No skills listed.</p>
+                    <p class="applications-view-title">No skills listed.</p>
                 }
             </div>
         }
