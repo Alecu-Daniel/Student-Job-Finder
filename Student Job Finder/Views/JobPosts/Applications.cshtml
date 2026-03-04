@@ -1,6 +1,7 @@
 ﻿@model List<Student_Job_Finder.Models.JobApplicationViewModel>
 
 @using Student_Job_Finder.Helpers
+@using Student_Job_Finder.Models
 
 <p class="applications-view-title">Job Applications</p>
 
@@ -44,33 +45,75 @@ else
                         <span>Additional Skill</span>
                     </div>
                 </div>
-
-                <p class="application-student-skill-title">Student Skills</p>
                 
-
                 @if (app.StudentSkills.Any())
                 {
                     <ul class="application-skills-list">
-                        @foreach (var skill in app.StudentSkills)
+                        @{
+                            var requiredSkillNames = app.RequiredSkills.Select(r => r.SkillName).ToList();
+
+                            var requiredStudentSkills = app.StudentSkills
+                            .Where(s => requiredSkillNames.Contains(s.SkillName))
+                            .OrderBy(s => s.SkillName);
+
+                            var additionalStudentSkills = app.StudentSkills
+                            .Where(s => !requiredSkillNames.Contains(s.SkillName))
+                            .OrderBy(s => s.SkillName);
+
+                            var sortedSkills = requiredStudentSkills.Concat(additionalStudentSkills).ToList();
+                            
+                            bool dividerPlaced = false;
+                        }
+
+                        <li class="application-skill-column-label">Skill Names</li>
+                        <li class="application-skill-column-label">Student Skills</li>
+                        <li class="application-skill-column-label">Quiz Skills</li>
+                        <li class="application-skill-column-label"></li>
+
+
+                        @foreach (var skill in sortedSkills)
                         {
+
+                            @if (!dividerPlaced && !requiredSkillNames.Contains(skill.SkillName) && requiredStudentSkills.Any())
+                            {
+                                <li class="skill-list-divider">
+                                    <span>Additional Skills</span>
+                                </li>
+                                dividerPlaced = true;
+                            }
+
+
                             <li class="application-skill-item">
-                                <span class="application-skill-name">@skill.SkillName</span>
+                                <span class="application-skill-name">
+                                    @skill.SkillName
+                                </span>
+
                                 <span class="application-skill-level @SkillHelper.SkillColorClass(skill.SkillScore)">
                                     @SkillHelper.SkillLevelName(skill.SkillScore)
                                 </span>
-                                
+
+                                @{
+                                    var quizMatch = app.QuizResults?.FirstOrDefault(q => q.SkillName == skill.SkillName);
+                                }
+                                <span class="application-skill-level @(quizMatch != null ? SkillHelper.SkillColorClass(quizMatch.SkillScore) : null)">
+                                    @(quizMatch != null ? SkillHelper.SkillLevelName(quizMatch.SkillScore) : "N/A")
+                                </span>
+
+
                                 @{
                                     var matchingRequirement = app.RequiredSkills
                                     .FirstOrDefault(r => r.SkillName.Equals(skill.SkillName));
+
+                                    decimal evaluatedScore = quizMatch?.SkillScore ?? skill.SkillScore;
                                 }
 
                                 @if (matchingRequirement != null)
                                 {
-                                    @if (SkillHelper.GetSkillLevel(skill.SkillScore) < SkillHelper.GetSkillLevel(matchingRequirement.SkillScore))
+                                    @if (SkillHelper.GetSkillLevel(evaluatedScore) < SkillHelper.GetSkillLevel(matchingRequirement.SkillScore))
                                     {
                                         <ion-icon name="arrow-down-outline" class="application-less-icon"></ion-icon>
                                     }
-                                    else if (SkillHelper.GetSkillLevel(skill.SkillScore) == SkillHelper.GetSkillLevel(matchingRequirement.SkillScore))
+                                    else if (SkillHelper.GetSkillLevel(evaluatedScore) == SkillHelper.GetSkillLevel(matchingRequirement.SkillScore))
                                     {
                                         <ion-icon name="reorder-two-outline" class="application-equal-icon"></ion-icon>
                                     }

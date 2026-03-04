@@ -58,11 +58,43 @@
     font-weight: 600;
 }
 
-.application-student-skill-title {
+.application-skill-column-label {
     font-size: 2rem;
     font-weight: 600;
-    margin-top: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    list-style: none;
+
 }
+
+.skill-list-divider {
+    grid-column: 1 / span 4;
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0 0.5rem 0;
+    color: #555;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+    .skill-list-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #555;
+        margin-left: 1rem;
+    }
+
+    .skill-list-divider::before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #555;
+        margin-left: 1rem;
+    }
+
 
 .application-skills-legend {
     display: flex;
@@ -92,10 +124,9 @@
 
 .application-skills-list {
     display: grid;
-    grid-template-columns: auto 1fr 1fr;
-    gap: 2rem 5rem;
+    grid-template-columns: 1.5fr 1fr 1fr 0.5fr;
+    gap: 1.5rem;
     align-items: center;
-    margin-top: 2rem;
 }
 
 .application-skill-item {

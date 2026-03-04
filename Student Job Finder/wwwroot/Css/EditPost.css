@@ -115,3 +115,46 @@
     font-size: 2rem;
     font-weight: 600;
 }
+
+
+
+.edit-post-quiz-title {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.edit-post-quiz-container {
+
+}
+
+.edit-post-quiz-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.edit-post-quiz-select {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+}
+
+.edit-post-input-container-quiz-content {
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+    min-height: 10rem;
+}
+
+.edit-post-quiz-content {
+    padding: 0.8rem 1rem;
+    font-size: 1.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.3s;
+    flex-grow: 1;
+    resize: none;
+}

@@ -10,5 +10,6 @@
 
         public List<JobSkill> PostSkills { get; set; } = new();
         public List<StudentSkill> StudentSkills { get; set; } = new();
+        public List<QuizQuestion> ExistingQuestions { get; set; } = new();
     }
 }
