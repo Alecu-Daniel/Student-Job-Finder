@@ -168,17 +168,6 @@ namespace Student_Job_Finder.Controllers
                     .ToList();
             }
 
-
-            // If two jobs have the same similarity sort by the one that give the most pay
-
-            //Make filters for: Skill , Pay , Match(reset)
-
-            // For every job post , show which skills are underqualified: name , required level , student level
-
-            // Make a View that shows how many jobs oportunities would be created if i progressed a skill by one level
-            // look at student skill , look at all job post skills one level above , count how many job posts require the skill one level above
-            // List all such statistsics by the number of oportunities they create , also list max earning per hour (the job post with the required skill that has most pay)
-
             return View("~/Views/JobMatching/MatchedJobs.cshtml", results);
 
 

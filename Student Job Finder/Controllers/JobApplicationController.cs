@@ -49,9 +49,39 @@ namespace Student_Job_Finder.Controllers
                      "," + studentId +
                      ",'" + application.Message +
                      "'" + ")";
+           
+            if(!_dapper.ExecuteSql(insertSql))
+           {
+                throw new Exception("Cant create Application");
+           }
 
-            if (!_dapper.ExecuteSql(insertSql))
-                throw new Exception("Failed to apply to job");
+
+
+            string appIdSql = "SELECT JobApplicationId FROM JobFinderSchema.JobApplications WHERE JobPostId = " +
+                  application.JobPostId + " AND StudentId = " + studentId;
+
+            int newAppId = _dapper.LoadDataSingle<int>(appIdSql);
+
+            string checkQuizSql = "SELECT COUNT(1) FROM JobFinderSchema.QuizQuestions WHERE JobPostId = " + application.JobPostId;
+            int questionCount = _dapper.LoadDataSingle<int>(checkQuizSql);
+
+            if (questionCount > 0)
+            {
+                string createQuizSql = $@"
+                    INSERT INTO JobFinderSchema.Quizzes (JobApplicationId, StudentId, CompletedAt)
+                    VALUES ({newAppId}, {studentId}, NULL)";
+
+                if (!_dapper.ExecuteSql(createQuizSql))
+                {
+                    throw new Exception("Cant create Quiz");
+                }
+
+                string quizIdSql = "SELECT QuizId FROM JobFinderSchema.Quizzes WHERE JobApplicationId = " + newAppId;
+
+                int quizId = _dapper.LoadDataSingle<int>(quizIdSql);
+
+                return RedirectToAction("TakeQuiz", "Quiz", new { quizId = quizId });
+            }
 
             return LocalRedirect(returnUrl);
         }
@@ -94,7 +124,13 @@ namespace Student_Job_Finder.Controllers
 
                 var skills = _dapper.LoadData<StudentSkill>(studentSkillSql);
 
-                
+                string quizSql = @"SELECT qs.* FROM JobFinderSchema.QuizSkills qs 
+                           JOIN JobFinderSchema.Quizzes q ON qs.QuizId = q.QuizId 
+                           WHERE q.JobApplicationId = " + app.JobApplicationId;
+
+                var quizSkills = _dapper.LoadData<QuizSkill>(quizSql);
+
+
 
                 var vm = new JobApplicationViewModel()
                 {
@@ -102,7 +138,8 @@ namespace Student_Job_Finder.Controllers
                     LastName = student.LastName,
                     Email = student.Email,
                     StudentSkills = skills.ToList(),
-                    RequiredSkills = jobPostSkills.ToList()
+                    RequiredSkills = jobPostSkills.ToList(),
+                    QuizResults = quizSkills.ToList()
                 };
 
                 results.Add(vm);

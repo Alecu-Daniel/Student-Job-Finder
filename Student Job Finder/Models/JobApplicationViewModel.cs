@@ -10,6 +10,7 @@ namespace Student_Job_Finder.Models
         public string Email { get; set; } = "";
         public List<StudentSkill> StudentSkills { get; set; } = new();
         public List<JobSkill>   RequiredSkills { get; set; } = new();
+        public List<QuizSkill> QuizResults { get; set; } = new();
         public decimal MatchScore
         {
             get
@@ -23,8 +24,11 @@ namespace Student_Job_Finder.Models
                 {
                     jobVector.Add(req.SkillScore);
 
-                    var match = StudentSkills.FirstOrDefault(s => s.SkillName == req.SkillName);
-                    studentVector.Add(match?.SkillScore ?? 0m);
+                    var quizMatch = QuizResults.FirstOrDefault(q => q.SkillName == req.SkillName);
+                    var transcriptMatch = StudentSkills.FirstOrDefault(s => s.SkillName == req.SkillName);
+
+                    decimal finalScore = quizMatch?.SkillScore ?? transcriptMatch?.SkillScore ?? 0m;
+                    studentVector.Add(finalScore);
                 }
 
                 return JobMatchingService.ComputeJobMatchScore(studentVector, jobVector) * 100;

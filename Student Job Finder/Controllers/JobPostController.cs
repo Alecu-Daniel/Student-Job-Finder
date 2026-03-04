@@ -116,6 +116,7 @@ namespace Student_Job_Finder.Controllers
 
             };
 
+
             return View("~/Views/JobPosts/JobPost.cshtml", vm);
         }
 
@@ -139,9 +140,13 @@ namespace Student_Job_Finder.Controllers
             var post = _dapper.LoadDataSingle<JobPost>(postSql);
 
             string skillsSql = @"
-        SELECT JobSkillId, JobPostId, SkillName, SkillScore
-        FROM JobFinderSchema.JobSkills
-        WHERE JobPostId = " + postId;
+            SELECT JobSkillId, JobPostId, SkillName, SkillScore
+            FROM JobFinderSchema.JobSkills
+            WHERE JobPostId = " + postId;
+
+            string quizQuestionsSql = @"SELECT * FROM JobFinderSchema.QuizQuestions 
+                                WHERE JobPostId = " + postId;
+            var quizQuestions = _dapper.LoadData<QuizQuestion>(quizQuestionsSql);
 
             var skills = _dapper.LoadData<JobSkill>(skillsSql);
 
@@ -152,7 +157,8 @@ namespace Student_Job_Finder.Controllers
                 PostContent = post.PostContent,
                 Price = post.Price,
                 PricePeriod = post.PricePeriod,
-                PostSkills = skills.ToList()
+                PostSkills = skills.ToList(),
+                ExistingQuestions = quizQuestions.ToList()
             };
 
             return View("~/Views/JobPosts/EditPost.cshtml", vm);
