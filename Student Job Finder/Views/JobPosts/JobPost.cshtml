@@ -6,13 +6,28 @@
 }
 
 <div class="container job-view-container">
-    <h2 class="job-view-title">@Model.PostTitle</h2>
+    <div class="job-view-header">
+        <h2 class="job-view-title">@Model.PostTitle</h2>
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="~/UserUploads/Images/@Model.ImageUrl" class="job-view-photo" alt="Job Image" />
+        }
+    </div>
 
     <p class="job-view-price">
         @Model.Price.ToString("0.00") €
         / @Model.PricePeriod
     </p>
 
+    @if (!string.IsNullOrEmpty(Model.VideoUrl))
+    {
+        <div class="job-view-video-container">
+            <video controls class="job-view-video">
+                <source src="~/UserUploads/Videos/@Model.VideoUrl" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    }
 
     @if (Model.PostSkills.Any())
     {

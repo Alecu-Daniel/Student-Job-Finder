@@ -7,6 +7,8 @@
         public string PostContent { get; set; } = "";
         public decimal Price { get; set; }
         public string PricePeriod { get; set; } = "";
+        public string? ImageUrl { get; set; }
+        public string? VideoUrl { get; set; }
 
         public List<JobSkill> PostSkills { get; set; } = new();
         public List<StudentSkill> StudentSkills { get; set; } = new();

@@ -52,9 +52,18 @@ else
         {
             <div class="job-match-card">
 
-                <a class="job-post-title" href="/JobPost/PostSingle/@result.Job.PostId">
-                      @result.Job.PostTitle
-                </a>
+                <div class="job-card-header">
+                    <a class="job-post-title" href="/JobPost/PostSingle/@result.Job.PostId">
+                        @result.Job.PostTitle
+                    </a>
+
+                    @if (!string.IsNullOrEmpty(result.Job.ImageUrl))
+                    {
+                        <img src="~/UserUploads/Images/@result.Job.ImageUrl"
+                             alt="Job thumbnail"
+                             class="job-post-thumbnail" />
+                    }
+                </div>
                 
                 <p class="job-post-content">@result.Job.PostContent</p>
                 

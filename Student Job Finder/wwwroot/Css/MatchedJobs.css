@@ -62,17 +62,32 @@
         height: 100%;
     }
 
-.job-post-title {
-    display: block;
 
+.job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+
+.job-post-title {
+    display: inline-block;
     font-size: 2.4rem;
     font-weight: bold;
     text-decoration: none;
+    margin-bottom: 0;
+    flex: 1;
+}
 
-    justify-self: center;
-
-    margin-bottom: 2rem;
-
+.job-post-thumbnail {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid #eee;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .job-post-content {

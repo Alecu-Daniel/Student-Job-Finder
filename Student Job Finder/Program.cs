@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<StudentSkillService>();
 builder.Services.AddScoped<JobMatchingService>();
 builder.Services.AddScoped<QuizService>();
+builder.Services.AddScoped<FileService>();
 
 
 string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
