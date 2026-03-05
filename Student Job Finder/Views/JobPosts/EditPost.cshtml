@@ -73,7 +73,7 @@
         <button type="submit" class="btn btn--form edit-post-form-btn">Add Skill</button>
     </form>
 
-        <form method="post" action="/JobPost/EditPost">
+        <form method="post" action="/JobPost/EditPost" enctype="multipart/form-data">
             <input type="hidden" name="PostId" value="@Model.PostId" />
 
             
@@ -81,6 +81,15 @@
             <div class="edit-post-input-container">
                 <label for="PostTitle" class="edit-post-input-label">Title</label>
                 <input type="text" id="PostTitle" name="PostTitle" value="@Model.PostTitle" required class="edit-post-input" />
+            </div>
+
+
+            <div class="edit-post-input-container">
+                <label class="edit-post-input-label">Photo (Optional)</label>
+                <input type="file" name="ImageFile" accept="image/*" class="edit-post-input" />
+
+                <label class="edit-post-input-label">Video (Optional)</label>
+                <input type="file" name="VideoFile" accept="video/*" class="edit-post-input" />
             </div>
 
 

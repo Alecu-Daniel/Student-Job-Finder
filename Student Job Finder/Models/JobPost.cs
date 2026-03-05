@@ -10,6 +10,8 @@ namespace Student_Job_Finder.Models
         public string PostContent { get; set; } = "";
         public decimal Price { get; set; }
         public string PricePeriod { get; set; } = "";
+        public string? ImageUrl { get; set; }
+        public string? VideoUrl { get; set; }
         public DateTime PostCreated { get; set; }
         public DateTime PostUpdated { get; set; }
     }

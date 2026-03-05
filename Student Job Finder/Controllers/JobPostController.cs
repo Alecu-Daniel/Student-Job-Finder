@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
 using Student_Job_Finder.Models;
+using Student_Job_Finder.Services;
 using System.Linq;
 
 
@@ -13,9 +14,11 @@ namespace Student_Job_Finder.Controllers
     public class JobPostController : Controller
     {
         private readonly DataContextDapper _dapper;
-        public JobPostController(IConfiguration config)
+        private readonly FileService _fileService;
+        public JobPostController(IConfiguration config, FileService fileService)
         {
             _dapper = new DataContextDapper(config);
+            _fileService = fileService;
         }
 
         [HttpGet("Posts")]
@@ -104,6 +107,12 @@ namespace Student_Job_Finder.Controllers
 
             var studentSkills = _dapper.LoadData<StudentSkill>(studentSkillsSql);
 
+            string getMultimediaFilesSql = "SELECT ImageUrl, VideoUrl FROM JobFinderSchema.Posts WHERE PostId = " + postId;
+            var existingPost = _dapper.LoadDataSingle<JobPost>(getMultimediaFilesSql);
+            string finalImageName = existingPost.ImageUrl;
+            string finalVideoName = existingPost.VideoUrl;
+
+
             var vm = new JobSkillsViewModel
             {
                 PostId = post.PostId,
@@ -112,7 +121,9 @@ namespace Student_Job_Finder.Controllers
                 Price = post.Price,
                 PricePeriod = post.PricePeriod,
                 PostSkills = postSkills.ToList(),
-                StudentSkills = studentSkills.ToList()
+                StudentSkills = studentSkills.ToList(),
+                ImageUrl = finalImageName,
+                VideoUrl = finalVideoName
 
             };
 
@@ -202,17 +213,45 @@ namespace Student_Job_Finder.Controllers
 
 
         [HttpPost("EditPost")]
-        public IActionResult EditPost(JobPostToEditDto postToEdit)
+        public async Task<IActionResult> EditPost(JobPostToEditDto postToEdit, IFormFile? ImageFile, IFormFile? VideoFile)
         {
+            string userId = this.User.FindFirst("userId")?.Value;
+
+            string getMultimediaFilesSql = "SELECT ImageUrl, VideoUrl FROM JobFinderSchema.Posts WHERE PostId = " + postToEdit.PostId;
+            var existingPost = _dapper.LoadDataSingle<JobPost>(getMultimediaFilesSql);
+
+            string finalImageName = existingPost.ImageUrl;
+            string finalVideoName = existingPost.VideoUrl;
+
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(existingPost.ImageUrl))
+                    _fileService.DeleteFile(existingPost.ImageUrl, "Images");
+                finalImageName = await _fileService.SaveFileAsync(ImageFile, "Images");
+            }
+
+
+            if (VideoFile != null && VideoFile.Length > 0)
+            { 
+                if (!string.IsNullOrEmpty(existingPost.VideoUrl))
+                    _fileService.DeleteFile(existingPost.VideoUrl, "Videos");
+                finalVideoName = await _fileService.SaveFileAsync(VideoFile, "Videos");
+            }
+
+            string imgSqlValue = (finalImageName == null) ? "NULL" : "'" + finalImageName + "'";
+            string vidSqlValue = (finalVideoName == null) ? "NULL" : "'" + finalVideoName + "'";
+
             string sql = @"
             UPDATE JobFinderSchema.Posts
                 SET PostContent = '" + postToEdit.PostContent +
                 "', PostTitle = '" + postToEdit.PostTitle +
                 "', Price = " + postToEdit.Price +
                 ", PricePeriod = '" + postToEdit.PricePeriod +
-                @"', PostUpdated = GETDATE()
+                "', ImageUrl = " + imgSqlValue +
+                ", VideoUrl = " + vidSqlValue +
+                @", PostUpdated = GETDATE()
                     WHERE PostId = " + postToEdit.PostId.ToString() +
-                    "AND UserId = " + this.User.FindFirst("userId")?.Value;
+                    " AND UserId = " + userId;
 
             if (_dapper.ExecuteSql(sql))
             {
@@ -220,6 +259,8 @@ namespace Student_Job_Finder.Controllers
             }
 
             throw new Exception("Failed to edit post!");
+
+
         }
 
 

@@ -364,3 +364,27 @@ FodyWeavers.xsd
 
 # Ignore environment-specific app settings
 appsettings.Development.json
+
+
+
+
+
+
+
+
+# Ignore all files in these directories
+Student Job Finder/wwwroot/UserUploads/Images/*
+Student Job Finder/wwwroot/UserUploads/Videos/*
+
+# Prevent the folders themselves from being totally ignored 
+# (if you choose to use .gitkeep files)
+!Student Job Finder/wwwroot/UserUploads/Images/.gitkeep
+!Student Job Finder/wwwroot/UserUploads/Videos/.gitkeep
+
+
+
+
+
+
+
+
