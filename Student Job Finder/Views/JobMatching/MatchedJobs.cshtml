@@ -106,9 +106,13 @@ else
                         </button>
                     </form>
 
-                    <button class="btn-chevron-icon" type="button">
-                        <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
-                    </button>
+                    @if(result.UnderqualifiedSkills.Any())
+                    {
+                        <button class="btn-chevron-icon" type="button">
+                            <ion-icon name="chevron-down-outline" class="chevron-icon"></ion-icon>
+                        </button>
+                    }
+                    
 
                 </div>
 

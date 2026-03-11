@@ -12,5 +12,42 @@
 
             <a href="#how" class="btn btn--outline">Learn more &darr;</a>
         </div>
+        <img src="~/Img/Logo.png" class="hero-img" />
     </div>
+
+
+    <section class="section-how" id="how">
+        <div class="container">
+            <span class="subheading">How it works</span>
+            <h2 class="heading-secondary">
+                Your journey from student to professional in 3 steps
+            </h2>
+
+            <div class="tutorial-toggle">
+                <a asp-action="Index" asp-route-viewType="student"
+                   class="btn btn--toggle @(ViewBag.ActiveView == "student" ? "btn--active" : "")">
+                    For Students
+                </a>
+
+                <a asp-action="Index" asp-route-viewType="recruiter"
+                   class="btn btn--toggle @(ViewBag.ActiveView == "recruiter" ? "btn--active" : "")">
+                    For Recruiters
+                </a>
+            </div>
+
+        </div>
+
+        @if (ViewBag.ActiveView == "student")
+        {
+            @await Html.PartialAsync("_StudentTutorial")
+        }
+        else
+        {
+            @await Html.PartialAsync("_RecruiterTutorial")
+        }
+
+        
+    </section>
+
+
 </section>
