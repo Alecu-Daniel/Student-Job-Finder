@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
 using Student_Job_Finder.Models;
 using Student_Job_Finder.Services;
+using System.Data;
 using System.Linq;
 
 
@@ -182,29 +185,29 @@ namespace Student_Job_Finder.Controllers
             if (User.FindFirst("userRole")?.Value != "Recruiter")
                 return Unauthorized("Only Recruiters can add job posts.");
 
+            string userId = User.FindFirst("userId")?.Value;
+
             string sql = @"
             INSERT INTO JobFinderSchema.Posts (
-                UserId,
-                PostTitle,
-                PostContent,
-                Price,
-                PricePeriod,
-                PostCreated,
-                PostUpdated
+                UserId, PostTitle, PostContent, Price, PricePeriod, PostCreated, PostUpdated
             )
             VALUES (
-                " + User.FindFirst("userId")?.Value + @",
-                '" + postToAdd.PostTitle + @"',
-                '" + postToAdd.PostContent + @"',
-                " + postToAdd.Price.ToString() + @",
-                '" + postToAdd.PricePeriod + @"',
-                GETDATE(),
-                GETDATE()
+                @UserId, @PostTitle, @PostContent, @Price, @PricePeriod, GETDATE(), GETDATE()
             );
-            SELECT CAST(SCOPE_IDENTITY() as int);
-            ";
+            SELECT CAST(SCOPE_IDENTITY() as int);";
 
-            int newPostId = _dapper.LoadDataSingle<int>(sql);
+
+            DynamicParameters parameters = new DynamicParameters();
+
+
+            parameters.Add("@UserId", userId, DbType.Int32);
+            parameters.Add("@PostTitle", postToAdd.PostTitle, DbType.String);
+            parameters.Add("@PostContent", postToAdd.PostContent, DbType.String);
+            parameters.Add("@Price", postToAdd.Price, DbType.Decimal);
+            parameters.Add("@PricePeriod", postToAdd.PricePeriod, DbType.String);
+
+
+            int newPostId = _dapper.LoadDataSingleWithParameters<int>(sql, parameters);
 
             return RedirectToAction("EditPost", "JobPost", new { postId = newPostId });
         }
@@ -217,11 +220,14 @@ namespace Student_Job_Finder.Controllers
         {
             string userId = this.User.FindFirst("userId")?.Value;
 
-            string getMultimediaFilesSql = "SELECT ImageUrl, VideoUrl FROM JobFinderSchema.Posts WHERE PostId = " + postToEdit.PostId;
-            var existingPost = _dapper.LoadDataSingle<JobPost>(getMultimediaFilesSql);
+            string getMultimediaFilesSql = "SELECT ImageUrl, VideoUrl FROM JobFinderSchema.Posts WHERE PostId = @PostId";
+            DynamicParameters getParams = new DynamicParameters();
+            getParams.Add("@PostId", postToEdit.PostId);
 
-            string finalImageName = existingPost.ImageUrl;
-            string finalVideoName = existingPost.VideoUrl;
+            var existingPost = _dapper.LoadDataSingleWithParameters<JobPost>(getMultimediaFilesSql, getParams);
+
+            string? finalImageName = existingPost.ImageUrl;
+            string? finalVideoName = existingPost.VideoUrl;
 
             if (ImageFile != null && ImageFile.Length > 0)
             {
@@ -238,22 +244,32 @@ namespace Student_Job_Finder.Controllers
                 finalVideoName = await _fileService.SaveFileAsync(VideoFile, "Videos");
             }
 
-            string imgSqlValue = (finalImageName == null) ? "NULL" : "'" + finalImageName + "'";
-            string vidSqlValue = (finalVideoName == null) ? "NULL" : "'" + finalVideoName + "'";
-
             string sql = @"
             UPDATE JobFinderSchema.Posts
-                SET PostContent = '" + postToEdit.PostContent +
-                "', PostTitle = '" + postToEdit.PostTitle +
-                "', Price = " + postToEdit.Price +
-                ", PricePeriod = '" + postToEdit.PricePeriod +
-                "', ImageUrl = " + imgSqlValue +
-                ", VideoUrl = " + vidSqlValue +
-                @", PostUpdated = GETDATE()
-                    WHERE PostId = " + postToEdit.PostId.ToString() +
-                    " AND UserId = " + userId;
+            SET PostContent = @PostContent,
+                PostTitle = @PostTitle,
+                Price = @Price,
+                PricePeriod = @PricePeriod,
+                ImageUrl = @ImageUrl,
+                VideoUrl = @VideoUrl,
+                PostUpdated = GETDATE()
+            WHERE PostId = @PostId 
+            AND UserId = @UserId";
 
-            if (_dapper.ExecuteSql(sql))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("@PostContent", postToEdit.PostContent);
+            parameters.Add("@PostTitle", postToEdit.PostTitle);
+            parameters.Add("@Price", postToEdit.Price);
+            parameters.Add("@PricePeriod", postToEdit.PricePeriod);
+            parameters.Add("@PostId", postToEdit.PostId);
+            parameters.Add("@UserId", userId);
+
+            parameters.Add("@ImageUrl", finalImageName);
+            parameters.Add("@VideoUrl", finalVideoName);
+
+
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return RedirectToAction("MyPosts", "JobPost");
             }
