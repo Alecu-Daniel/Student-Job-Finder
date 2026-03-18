@@ -1,0 +1,165 @@
+﻿.quiz-title {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.quiz-questions-container {
+}
+
+.add-quiz-input-container {
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.add-quiz-input-label {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.add-quiz-input {
+    padding: 0.8rem 1rem;
+    font-size: 1.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.add-quiz-post-input {
+    padding: 0.8rem 1rem;
+    font-size: 1.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.quiz-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.quiz-select {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+}
+
+.input-container-quiz-content {
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+    min-height: 10rem;
+}
+
+.quiz-content {
+    padding: 0.8rem 1rem;
+    font-size: 1.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.3s;
+    flex-grow: 1;
+    resize: none;
+}
+
+.add-quiz-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+    padding: 3rem 3rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    background-color: #fff;
+}
+
+.add-quiz-form-btn {
+    justify-self:start;
+    align-self: center;
+    height: 50%;
+}
+
+
+.add-quiz-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60rem, 1fr));
+    gap: 2rem;
+    margin: 3rem 2rem 3rem 2rem;
+}
+
+.add-quiz-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 350px;
+}
+
+.add-quiz-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.add-quiz-skill-title {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.add-quiz-delete-btn
+{
+    background:none;
+    border: none;
+}
+
+.add-quiz-trash-icon {
+    color: red;
+    font-size: 4rem;
+}
+
+.add-quiz-question-text {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.add-quiz-options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    font-size: 1.7rem;
+    color: #444;
+    padding: 1rem 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+    .add-quiz-options-grid p {
+        margin: 0;
+        line-height: 1.5;
+        overflow-wrap: break-word;
+    }
+    .add-quiz-options-grid span {
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+.add-quiz-card-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    font-size: 1.6rem;
+    color: #27ae60;
+}

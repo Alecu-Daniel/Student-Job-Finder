@@ -18,6 +18,25 @@ namespace Student_Job_Finder.Controllers
             _dapper = new DataContextDapper(config);
         }
 
+        [HttpGet("AddQuiz/{jobPostId}")]
+        public IActionResult AddQuiz(int jobPostId)
+        {
+            string sql = "SELECT * FROM JobFinderSchema.Posts WHERE PostId = " + jobPostId;
+            var post = _dapper.LoadDataSingle<JobPost>(sql);
+
+            string questionsSql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE JobPostId = " + jobPostId;
+            var questions = _dapper.LoadData<QuizQuestion>(questionsSql);
+
+            var model = new JobSkillsViewModel
+            {
+                PostId = jobPostId,
+                PostTitle = post.PostTitle,
+                ExistingQuestions = questions.ToList()
+            };
+
+            return View(model);
+        }
+
         [HttpPost("AddQuestion")]
         public IActionResult AddQuestion(QuizQuestionToAddDto question)
         {
@@ -35,7 +54,7 @@ namespace Student_Job_Finder.Controllers
 
             if (_dapper.ExecuteSql(sql))
             {
-                return RedirectToAction("EditPost", "JobPost", new { postId = question.JobPostId });
+                return RedirectToAction("AddQuiz", "Quiz", new { jobPostId = question.JobPostId });
             }
             throw new Exception("Failed to add question");
         }
@@ -55,7 +74,7 @@ namespace Student_Job_Finder.Controllers
 
             if (_dapper.ExecuteSql(sql))
             {
-                return RedirectToAction("EditPost", "JobPost", new { postId });
+                return RedirectToAction("AddQuiz", "Quiz", new { jobPostId = postId });
             }
 
             throw new Exception("Failed to delete question");

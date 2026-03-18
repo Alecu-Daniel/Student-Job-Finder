@@ -115,86 +115,14 @@
                     <textarea id="PostContent" name="PostContent" rows="6" required class="edit-post-content">@Model.PostContent</textarea>
                 </div>
 
+        <div class="edit-post-actions">
             <button type="submit" class="btn btn--form">Save Changes</button>
+
+            <a href="/Quiz/AddQuiz/@Model.PostId" class="btn btn--form">
+                Manage Quiz Questions
+            </a>
+
+        </div>
         </form>
         
-</div>
-
-<div class="container edit-post-container margin-bottom-md">
-
-
-    <h3 class="edit-post-quiz-title">Quiz Questions</h3>
-
-    @if (Model.ExistingQuestions.Any())
-    {
-        <div class="edit-post-quiz-container">
-            <ul class="edit-post-quiz-list">
-                @foreach (var question in Model.ExistingQuestions)
-                {
-                    <li class="edit-post-skill">
-                        <div class="edit-post-skill-info">
-                            <p><strong>@question.SkillName:</strong> @question.QuestionText</p>
-                            <p>Correct: @question.CorrectOption</p>
-                        </div>
-                        <form method="post" action="/Quiz/DeleteQuestion/@question.QuestionId" class="skill-delete-form">
-                            <input type="hidden" name="postId" value="@Model.PostId" />
-                            <button type="submit" class="edit-post-skill-delete-btn" title="Remove Question">
-                                <ion-icon name="close-circle-outline" class="edit-post-skill-delete-icon"></ion-icon>
-                            </button>
-                        </form>
-                    </li>
-                }
-            </ul>
-        </div>
-    }
-
-    <form method="post" action="/Quiz/AddQuestion">
-        <div class="edit-post-quiz-select">
-            <input type="hidden" name="JobPostId" value="@Model.PostId" />
-
-            <div class="edit-post-input-container">
-                <label for="SkillName" class="edit-post-input-label">Skill to Test</label>
-                <select id="SkillName" name="SkillName" required class="edit-post-input">
-                    @foreach (var skill in SkillHelper.allSkills)
-                    {
-                        <option value="@skill">@skill</option>
-                    }
-                </select>
-            </div>
-
-            <div class="edit-post-input-container-quiz-content">
-                <label for="QuestionText" class="edit-post-input-label">Question Text</label>
-                <textarea id="QuestionText" name="QuestionText" required class="edit-post-quiz-content"></textarea>
-            </div>
-
-            <div class="edit-post-input-container">
-                <label for="OptionA" class="edit-post-input-label">Option A</label>
-                <input type="text" id="OptionA" name="OptionA" required class="edit-post-input" />
-            </div>
-            <div class="edit-post-input-container">
-                <label for="OptionB" class="edit-post-input-label">Option B</label>
-                <input type="text" id="OptionB" name="OptionB" required class="edit-post-input" />
-            </div>
-            <div class="edit-post-input-container">
-                <label for="OptionC" class="edit-post-input-label">Option C</label>
-                <input type="text" id="OptionC" name="OptionC" required class="edit-post-input" />
-            </div>
-            <div class="edit-post-input-container">
-                <label for="OptionD" class="edit-post-input-label">Option D</label>
-                <input type="text" id="OptionD" name="OptionD" required class="edit-post-input" />
-            </div>
-
-            <div class="edit-post-input-container">
-                <label for="CorrectOption" class="edit-post-input-label">Correct Option</label>
-                <select id="CorrectOption" name="CorrectOption" required class="edit-post-input">
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn--form edit-post-form-btn">Add Question</button>
-        </div>
-    </form>
-
 </div>
