@@ -63,6 +63,18 @@
        
     }
 
+    <div class="job-view-reputation-section">
+        <h3 class="reputation-label">About the Employer</h3>
+        <a asp-controller="Feedback"
+           asp-action="RecruiterReviews"
+           asp-route-postId="@Model.PostId"
+           class="btn-reputation">
+            <ion-icon name="star-outline"></ion-icon>
+            View Recruiter Feedback
+        </a>
+    </div>
+
+
     <p class="job-view-content">@Model.PostContent</p>
     
 

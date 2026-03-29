@@ -1,0 +1,34 @@
+﻿@model Student_Job_Finder.Models.AcceptedJobViewModel
+
+<div class="container add-quiz-container">
+    <h2 class="quiz-title">Review your experience with @Model.RecruiterName</h2>
+    <p class="feedback-subtitle">Post: <strong>@Model.PostTitle</strong></p>
+
+    <form asp-action="PostFeedback" method="post" class="feedback-form">
+        <input type="hidden" name="JobApplicationId" value="@Model.JobApplicationId" />
+        <input type="hidden" name="JobPostId" value="@Model.JobPostId" />
+        <input type="hidden" name="RecruiterId" value="@Model.RecruiterId" />
+
+        <div class="add-quiz-input-container">
+            <label class="add-quiz-input-label">Overall Rating</label>
+            <select name="Rating" required class="add-quiz-input">
+                <option value="5">5 - Excellent</option>
+                <option value="4">4 - Very Good</option>
+                <option value="3">3 - Good / Average</option>
+                <option value="2">2 - Poor</option>
+                <option value="1">1 - Terrible</option>
+            </select>
+        </div>
+
+        <div class="add-quiz-input-container-content">
+            <label class="add-quiz-input-label">Detailed Feedback</label>
+            <textarea name="Comment" required class="add-quiz-content"
+                      placeholder="How was the communication? Was the job as described?"></textarea>
+        </div>
+
+        <div class="feedback-actions">
+            <button type="submit" class="btn btn--form">Submit Review</button>
+            <a href="/Feedback/MyAcceptedJobs" class="btn btn--form btn--cancel">Cancel</a>
+        </div>
+    </form>
+</div>
