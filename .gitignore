@@ -382,6 +382,10 @@ Student Job Finder/wwwroot/UserUploads/Videos/*
 !Student Job Finder/wwwroot/UserUploads/Videos/.gitkeep
 
 
+# Ignore local app setings
+appsettings.json
+appsettings.Development.json
+
 
 
 
