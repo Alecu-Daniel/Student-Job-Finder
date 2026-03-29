@@ -1,5 +1,7 @@
-﻿using Student_Job_Finder.Data;
+﻿using Dapper;
+using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
+using System.Data;
 
 public class StudentSkillService
 {
@@ -15,21 +17,28 @@ public class StudentSkillService
         if (string.IsNullOrEmpty(userId) || skills == null || skills.Count == 0)
             throw new Exception("Invalid user or no skills provided");
 
-        string deleteSql = $@"
-            DELETE FROM JobFinderSchema.StudentSkills
-            WHERE StudentId = {userId}";
+        string deleteSql = @"
+        DELETE FROM JobFinderSchema.StudentSkills
+        WHERE StudentId = @UserId";
 
-        _dapper.ExecuteSql(deleteSql);
+        DynamicParameters deleteParams = new DynamicParameters();
+        deleteParams.Add("UserId", userId, DbType.String);
+
+        _dapper.ExecuteSqlWithParameters(deleteSql, deleteParams);
 
         foreach (var skill in skills)
         {
-            string sql = $@"
-                INSERT INTO JobFinderSchema.StudentSkills
-                ([StudentId], [SkillName], [SkillScore])
-                VALUES ({userId}, '{skill.SkillName}', {skill.SkillScore})
-            ";
+            string sql = @"
+            INSERT INTO JobFinderSchema.StudentSkills
+            ([StudentId], [SkillName], [SkillScore])
+            VALUES (@UserId, @SkillName, @SkillScore)";
 
-            if (!_dapper.ExecuteSql(sql))
+            DynamicParameters insertParams = new DynamicParameters();
+            insertParams.Add("UserId", userId, DbType.String);
+            insertParams.Add("SkillName", skill.SkillName, DbType.String);
+            insertParams.Add("SkillScore", skill.SkillScore, DbType.Decimal);
+
+            if (!_dapper.ExecuteSqlWithParameters(sql, insertParams))
                 throw new Exception($"Failed to add skill: {skill.SkillName}");
         }
     }

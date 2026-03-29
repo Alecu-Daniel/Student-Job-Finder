@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
-using Student_Job_Finder.Models;
 using Student_Job_Finder.Helpers;
+using Student_Job_Finder.Models;
+using System.Data;
 using System.Reflection.Metadata.Ecma335;
 
 namespace Student_Job_Finder.Controllers
@@ -35,27 +37,36 @@ namespace Student_Job_Finder.Controllers
         public IEnumerable<StudentSkill> GetSkillsByUser(int studentId)
         {
             string sql = @"SELECT [StudentSkillId],
-                    [StudentId],
-                    [SkillName],
-                    [SkillScore]
-                    FROM JobFinderSchema.StudentSkills
-                    WHERE StudentId = " + studentId.ToString();
-            return _dapper.LoadData<StudentSkill>(sql);
+                [StudentId],
+                [SkillName],
+                [SkillScore]
+                FROM JobFinderSchema.StudentSkills
+                WHERE StudentId = @StudentId";
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("StudentId", studentId, DbType.Int32);
+
+            return _dapper.LoadDataWithParameters<StudentSkill>(sql, parameters);
         }
 
 
         [HttpGet("MySkills")]
         public  IActionResult MySkills()
         {
+            string userId = this.User.FindFirst("userId")?.Value;
+
             string studentSql = @"
                 SELECT [StudentSkillId],
                     [StudentId],
                     [SkillName],
                     [SkillScore]
                     FROM JobFinderSchema.StudentSkills
-                WHERE StudentId = " + this.User.FindFirst("userId")?.Value;
+                WHERE StudentId = @StudentId";
 
-            var studentSkills = _dapper.LoadData<StudentSkill>(studentSql);
+            DynamicParameters studentParams = new DynamicParameters();
+            studentParams.Add("StudentId", userId, DbType.String);
+
+            var studentSkills = _dapper.LoadDataWithParameters<StudentSkill>(studentSql, studentParams);
 
             string jobSql = @"
                 SELECT [JobSkillId],
@@ -66,22 +77,19 @@ namespace Student_Job_Finder.Controllers
 
             var jobSkills = _dapper.LoadData<StudentSkill>(jobSql);
 
-
             Dictionary<string, int> potentialJobsWithImprovement = new Dictionary<string, int>();
-
 
             foreach (var skill in studentSkills)
             {
-
                 SkillLevel studentLevel = SkillHelper.GetSkillLevel(skill.SkillScore);
 
                 foreach (var job in jobSkills)
                 {
-                    if( skill.SkillName == job.SkillName)
+                    if (skill.SkillName == job.SkillName)
                     {
                         SkillLevel jobLevel = SkillHelper.GetSkillLevel(job.SkillScore);
 
-                        if(jobLevel == studentLevel + 1)
+                        if (jobLevel == studentLevel + 1)
                         {
                             if (potentialJobsWithImprovement.ContainsKey(skill.SkillName))
                             {
@@ -92,10 +100,6 @@ namespace Student_Job_Finder.Controllers
                                 potentialJobsWithImprovement.Add(skill.SkillName, 1);
                             }
                         }
-                    }
-                    else
-                    {
-                        continue;
                     }
                 }
             }
@@ -113,25 +117,27 @@ namespace Student_Job_Finder.Controllers
         [HttpPost("AddSkills")]
         public IActionResult AddSkills([FromBody] List<StudentSkillToAddDto> skills)
         {
-            if (skills == null || skills.Count == 0)
+            if (skills == null || !skills.Any())
                 throw new Exception("No skills provided!");
 
-            foreach(var skill in skills)
+            string userId = this.User.FindFirst("userId")?.Value;
+
+            foreach (var skill in skills)
             {
                 string sql = @"
-                INSERT INTO JobFinderSchema.StudentSkills
-                ([StudentId], [SkillName], [SkillScore])
-                VALUES (" + this.User.FindFirst("userId")?.Value
-                + ",'" + skill.SkillName
-                + "'," + skill.SkillScore.ToString()
-                + ")";
+                    INSERT INTO JobFinderSchema.StudentSkills
+                    ([StudentId], [SkillName], [SkillScore])
+                    VALUES (@UserId, @SkillName, @SkillScore)";
 
-                if (!_dapper.ExecuteSql(sql))
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.String);
+                parameters.Add("SkillName", skill.SkillName, DbType.String);
+                parameters.Add("SkillScore", skill.SkillScore, DbType.Decimal);
+
+                if (!_dapper.ExecuteSqlWithParameters(sql, parameters))
                 {
-                    throw new Exception("Failed to create new skill!");
+                    throw new Exception($"Failed to create new skill: {skill.SkillName}!");
                 }
-
-
             }
 
             return Ok();
@@ -141,13 +147,18 @@ namespace Student_Job_Finder.Controllers
         public IActionResult EditSkills([FromBody] List<StudentSkillToAddDto> skills)
         {
 
+            string userId = this.User.FindFirst("userId")?.Value;
+
             string sqlDelete = @"
                 DELETE FROM JobFinderSchema.StudentSkills
-                    WHERE StudentId = " + this.User.FindFirst("userId")?.Value;
+                WHERE StudentId = @UserId";
 
-            if (!_dapper.ExecuteSql(sqlDelete))
+            DynamicParameters deleteParams = new DynamicParameters();
+            deleteParams.Add("UserId", userId, DbType.String);
+
+            if (!_dapper.ExecuteSqlWithParameters(sqlDelete, deleteParams))
             {
-                throw new Exception("Failed to delete skill!");
+                throw new Exception("Failed to delete existing skills!");
             }
 
             if (skills == null || skills.Count == 0)
@@ -156,19 +167,19 @@ namespace Student_Job_Finder.Controllers
             foreach (var skill in skills)
             {
                 string sqlEdit = @"
-                INSERT INTO JobFinderSchema.StudentSkills
-                ([StudentId], [SkillName], [SkillScore])
-                VALUES (" + this.User.FindFirst("userId")?.Value
-                + ",'" + skill.SkillName
-                + "'," + skill.SkillScore.ToString()
-                + ")";
+                    INSERT INTO JobFinderSchema.StudentSkills
+                    ([StudentId], [SkillName], [SkillScore])
+                    VALUES (@UserId, @SkillName, @SkillScore)";
 
-                if (!_dapper.ExecuteSql(sqlEdit))
+                DynamicParameters insertParams = new DynamicParameters();
+                insertParams.Add("UserId", userId, DbType.String);
+                insertParams.Add("SkillName", skill.SkillName, DbType.String);
+                insertParams.Add("SkillScore", skill.SkillScore, DbType.Decimal);
+
+                if (!_dapper.ExecuteSqlWithParameters(sqlEdit, insertParams))
                 {
-                    throw new Exception("Failed to create new skill!");
+                    throw new Exception($"Failed to create skill: {skill.SkillName}!");
                 }
-
-
             }
 
             return Ok();
@@ -177,11 +188,16 @@ namespace Student_Job_Finder.Controllers
         [HttpDelete("DeleteSkills")]
         public IActionResult DeleteSkills()
         {
+            string userId = this.User.FindFirst("userId")?.Value;
+
             string sqlDelete = @"
                 DELETE FROM JobFinderSchema.StudentSkills
-                    WHERE StudentId = " + this.User.FindFirst("userId")?.Value;
+                WHERE StudentId = @UserId";
 
-            if (_dapper.ExecuteSql(sqlDelete))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("UserId", userId, DbType.String);
+
+            if (_dapper.ExecuteSqlWithParameters(sqlDelete, parameters))
             {
                 return Ok();
             }

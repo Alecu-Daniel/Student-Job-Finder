@@ -47,13 +47,19 @@ namespace Student_Job_Finder.Controllers
                 [PostCreated],
                 [PostUpdated]
             FROM JobFinderSchema.Posts
-                WHERE UserId = " + userId.ToString();
-            return _dapper.LoadData<JobPost>(sql);
+                WHERE UserId = @UserId";
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("UserId", userId, DbType.Int32);
+
+            return _dapper.LoadDataWithParameters<JobPost>(sql, parameters);
         }
 
         [HttpGet("MyPosts")]
         public IActionResult GetMyJobPosts()
         {
+            string userId = this.User.FindFirst("userId")?.Value;
+
             string sql = @"SELECT [PostId],
                 [UserId],
                 [PostTitle],
@@ -63,9 +69,12 @@ namespace Student_Job_Finder.Controllers
                 [PostCreated],
                 [PostUpdated]
             FROM JobFinderSchema.Posts
-                WHERE UserId = " + this.User.FindFirst("userId")?.Value;
+                WHERE UserId = @UserId";
 
-            var posts = _dapper.LoadData<JobPost>(sql);
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("UserId", userId, DbType.String);
+
+            var posts = _dapper.LoadDataWithParameters<JobPost>(sql, parameters);
             return View("~/Views/JobPosts/MyPosts.cshtml", posts);
         }
 
@@ -81,37 +90,55 @@ namespace Student_Job_Finder.Controllers
                 [PostCreated],
                 [PostUpdated]
             FROM JobFinderSchema.Posts
-                WHERE PostTitle LIKE '%" + searchParam +
-                "%' OR PostContent LIKE '%" + searchParam + "%'";
+                WHERE PostTitle LIKE @Search 
+                OR PostContent LIKE @Search";
 
-            return _dapper.LoadData<JobPost>(sql);
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("Search", "%" + searchParam + "%", DbType.String);
+
+            return _dapper.LoadDataWithParameters<JobPost>(sql, parameters);
         }
 
         [HttpGet("PostSingle/{postId}")]
         public IActionResult GetJobPost(int postId)
         {
             string postSql = @"SELECT * 
-                       FROM JobFinderSchema.Posts
-                       WHERE PostId = " + postId;
+               FROM JobFinderSchema.Posts
+               WHERE PostId = @PostId";
 
-            var post = _dapper.LoadDataSingle<JobPost>(postSql);
+            DynamicParameters postParameters = new DynamicParameters();
+            postParameters.Add("PostId", postId, DbType.Int32);
+
+            var post = _dapper.LoadDataSingleWithParameters<JobPost>(postSql, postParameters);
             if (post == null)
                 return NotFound();
 
             string postSkillsSql = @"SELECT *
-                         FROM JobFinderSchema.JobSkills
-                         WHERE JobPostId = " + postId;
+                 FROM JobFinderSchema.JobSkills
+                 WHERE JobPostId = @PostId";
 
-            var postSkills = _dapper.LoadData<JobSkill>(postSkillsSql);
+            DynamicParameters postSkillsParameters = new DynamicParameters();
+            postSkillsParameters.Add("PostId", postId, DbType.Int32);
+
+            var postSkills = _dapper.LoadDataWithParameters<JobSkill>(postSkillsSql, postSkillsParameters);
+
+            string studentId = this.User.FindFirst("userId")?.Value;
 
             string studentSkillsSql = @"SELECT *
-                         FROM JobFinderSchema.StudentSkills
-                         WHERE StudentId = " + this.User.FindFirst("userId")?.Value;
+                 FROM JobFinderSchema.StudentSkills
+                 WHERE StudentId = @StudentId";
 
-            var studentSkills = _dapper.LoadData<StudentSkill>(studentSkillsSql);
+            DynamicParameters studentSkillsParameters = new DynamicParameters();
+            studentSkillsParameters.Add("StudentId", studentId, DbType.String);
 
-            string getMultimediaFilesSql = "SELECT ImageUrl, VideoUrl FROM JobFinderSchema.Posts WHERE PostId = " + postId;
-            var existingPost = _dapper.LoadDataSingle<JobPost>(getMultimediaFilesSql);
+            var studentSkills = _dapper.LoadDataWithParameters<StudentSkill>(studentSkillsSql, studentSkillsParameters);
+
+            string getMultimediaFilesSql = "SELECT ImageUrl, VideoUrl FROM JobFinderSchema.Posts WHERE PostId = @PostId";
+
+            DynamicParameters multimediaParameters = new DynamicParameters();
+            multimediaParameters.Add("PostId", postId, DbType.Int32);
+
+            var existingPost = _dapper.LoadDataSingleWithParameters<JobPost>(getMultimediaFilesSql, multimediaParameters);
             string finalImageName = existingPost.ImageUrl;
             string finalVideoName = existingPost.VideoUrl;
 
@@ -127,7 +154,6 @@ namespace Student_Job_Finder.Controllers
                 StudentSkills = studentSkills.ToList(),
                 ImageUrl = finalImageName,
                 VideoUrl = finalVideoName
-
             };
 
 
@@ -150,19 +176,30 @@ namespace Student_Job_Finder.Controllers
             if (User.FindFirst("userRole")?.Value != "Recruiter")
                 return Unauthorized();
 
-            string postSql = @"SELECT * FROM JobFinderSchema.Posts WHERE PostId = " + postId;
-            var post = _dapper.LoadDataSingle<JobPost>(postSql);
+            string postSql = @"SELECT * FROM JobFinderSchema.Posts WHERE PostId = @PostId";
+
+            DynamicParameters postParameters = new DynamicParameters();
+            postParameters.Add("PostId", postId, DbType.Int32);
+
+            var post = _dapper.LoadDataSingleWithParameters<JobPost>(postSql, postParameters);
 
             string skillsSql = @"
-            SELECT JobSkillId, JobPostId, SkillName, SkillScore
-            FROM JobFinderSchema.JobSkills
-            WHERE JobPostId = " + postId;
+                SELECT JobSkillId, JobPostId, SkillName, SkillScore
+                FROM JobFinderSchema.JobSkills
+                WHERE JobPostId = @PostId";
+
+            DynamicParameters skillsParameters = new DynamicParameters();
+            skillsParameters.Add("PostId", postId, DbType.Int32);
 
             string quizQuestionsSql = @"SELECT * FROM JobFinderSchema.QuizQuestions 
-                                WHERE JobPostId = " + postId;
-            var quizQuestions = _dapper.LoadData<QuizQuestion>(quizQuestionsSql);
+                        WHERE JobPostId = @PostId";
 
-            var skills = _dapper.LoadData<JobSkill>(skillsSql);
+            DynamicParameters quizParameters = new DynamicParameters();
+            quizParameters.Add("PostId", postId, DbType.Int32);
+
+            var quizQuestions = _dapper.LoadDataWithParameters<QuizQuestion>(quizQuestionsSql, quizParameters);
+
+            var skills = _dapper.LoadDataWithParameters<JobSkill>(skillsSql, skillsParameters);
 
             var vm = new JobSkillsViewModel
             {
@@ -283,11 +320,17 @@ namespace Student_Job_Finder.Controllers
         [HttpPost("DeletePost/{postId}")]
         public IActionResult DeletePost(int postId)
         {
-            string sql = @"DELETE FROM JobFinderSchema.Posts 
-                            WHERE PostId = " + postId.ToString()
-                            + "AND UserId = " + this.User.FindFirst("userId")?.Value;
+            string userId = this.User.FindFirst("userId")?.Value;
 
-            if (_dapper.ExecuteSql(sql))
+            string sql = @"DELETE FROM JobFinderSchema.Posts 
+                    WHERE PostId = @PostId 
+                    AND UserId = @UserId";
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("PostId", postId, DbType.Int32);
+            parameters.Add("UserId", userId, DbType.String);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return RedirectToAction("MyPosts", "JobPost");
             }
@@ -305,9 +348,11 @@ namespace Student_Job_Finder.Controllers
             decimal skillScore = 0.60m;
             switch (skillToAdd.SkillLevel)
             {
-                case "Beginner": skillScore = 0.60m;
+                case "Beginner":
+                    skillScore = 0.60m;
                     break;
-                case "Intermediate": skillScore = 0.65m;
+                case "Intermediate":
+                    skillScore = 0.65m;
                     break;
                 case "Advanced":
                     skillScore = 0.75m;
@@ -322,13 +367,14 @@ namespace Student_Job_Finder.Controllers
             string sql = @"
                 INSERT INTO JobFinderSchema.JobSkills
                     (JobPostId, SkillName, SkillScore)
-                VALUES (" +
-                    skillToAdd.JobPostId + ", '" +
-                    skillToAdd.SkillName + "', " +
-                    skillScore.ToString() +
-                ")";
+                VALUES (@JobPostId, @SkillName, @SkillScore)";
 
-            if (_dapper.ExecuteSql(sql))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("JobPostId", skillToAdd.JobPostId, DbType.Int32);
+            parameters.Add("SkillName", skillToAdd.SkillName, DbType.String);
+            parameters.Add("SkillScore", skillScore, DbType.Decimal);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
                 return RedirectToAction("EditPost", new { postId = skillToAdd.JobPostId });
 
             throw new Exception("Failed to add job skill");
@@ -343,10 +389,14 @@ namespace Student_Job_Finder.Controllers
 
             string sql = @"
                 DELETE FROM JobFinderSchema.JobSkills
-                WHERE JobSkillId = " + jobSkillId +
-                " AND JobPostId = " + postId;
+                WHERE JobSkillId = @JobSkillId 
+                AND JobPostId = @JobPostId";
 
-            if (_dapper.ExecuteSql(sql))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("JobSkillId", jobSkillId, DbType.Int32);
+            parameters.Add("JobPostId", postId, DbType.Int32);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return RedirectToAction("EditPost", new { postId });
             }

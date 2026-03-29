@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
 using Student_Job_Finder.Models;
+using System.Data;
 
 namespace Student_Job_Finder.Controllers
 {
@@ -28,12 +30,16 @@ namespace Student_Job_Finder.Controllers
             string studentId = this.User.FindFirst("userId")?.Value;
 
             string duplicateSql = @"
-                        SELECT COUNT(1) 
-                        FROM JobFinderSchema.JobApplications
-                        WHERE JobPostId = " + application.JobPostId +
-                        " AND StudentId = " + studentId;
+                 SELECT COUNT(1) 
+                 FROM JobFinderSchema.JobApplications
+                 WHERE JobPostId = @JobPostId
+                 AND StudentId = @StudentId";
 
-            int alreadyApplied = _dapper.LoadDataSingle<int>(duplicateSql);
+            DynamicParameters duplicateParameters = new DynamicParameters();
+            duplicateParameters.Add("JobPostId", application.JobPostId, DbType.Int32);
+            duplicateParameters.Add("StudentId", studentId, DbType.Int32);
+
+            int alreadyApplied = _dapper.LoadDataSingleWithParameters<int>(duplicateSql, duplicateParameters);
 
             if (alreadyApplied > 0)
             {
@@ -42,43 +48,57 @@ namespace Student_Job_Finder.Controllers
 
 
             string insertSql = @"
-                INSERT INTO JobFinderSchema.JobApplications
-                (JobPostId, StudentId, Message)
-                VALUES ("
-                         + application.JobPostId +
-                     "," + studentId +
-                     ",'" + application.Message +
-                     "'" + ")";
-           
-            if(!_dapper.ExecuteSql(insertSql))
-           {
+             INSERT INTO JobFinderSchema.JobApplications
+             (JobPostId, StudentId, Message)
+             VALUES (@JobPostId, @StudentId, @Message)";
+
+            DynamicParameters insertParameters = new DynamicParameters();
+            insertParameters.Add("JobPostId", application.JobPostId, DbType.Int32);
+            insertParameters.Add("StudentId", studentId, DbType.Int32);
+            insertParameters.Add("Message", application.Message, DbType.String);
+
+            if (!_dapper.ExecuteSqlWithParameters(insertSql, insertParameters))
+            {
                 throw new Exception("Cant create Application");
-           }
+            }
 
 
+            string appIdSql = "SELECT JobApplicationId FROM JobFinderSchema.JobApplications WHERE JobPostId = @JobPostId AND StudentId = @StudentId";
 
-            string appIdSql = "SELECT JobApplicationId FROM JobFinderSchema.JobApplications WHERE JobPostId = " +
-                  application.JobPostId + " AND StudentId = " + studentId;
+            DynamicParameters appIdParameters = new DynamicParameters();
+            appIdParameters.Add("JobPostId", application.JobPostId, DbType.Int32);
+            appIdParameters.Add("StudentId", studentId, DbType.Int32);
 
-            int newAppId = _dapper.LoadDataSingle<int>(appIdSql);
+            int newAppId = _dapper.LoadDataSingleWithParameters<int>(appIdSql, appIdParameters);
 
-            string checkQuizSql = "SELECT COUNT(1) FROM JobFinderSchema.QuizQuestions WHERE JobPostId = " + application.JobPostId;
-            int questionCount = _dapper.LoadDataSingle<int>(checkQuizSql);
+            string checkQuizSql = "SELECT COUNT(1) FROM JobFinderSchema.QuizQuestions WHERE JobPostId = @JobPostId";
+
+            DynamicParameters checkQuizParameters = new DynamicParameters();
+            checkQuizParameters.Add("JobPostId", application.JobPostId, DbType.Int32);
+
+            int questionCount = _dapper.LoadDataSingleWithParameters<int>(checkQuizSql, checkQuizParameters);
 
             if (questionCount > 0)
             {
-                string createQuizSql = $@"
-                    INSERT INTO JobFinderSchema.Quizzes (JobApplicationId, StudentId, CompletedAt)
-                    VALUES ({newAppId}, {studentId}, NULL)";
+                string createQuizSql = @"
+             INSERT INTO JobFinderSchema.Quizzes (JobApplicationId, StudentId, CompletedAt)
+             VALUES (@JobApplicationId, @StudentId, NULL)";
 
-                if (!_dapper.ExecuteSql(createQuizSql))
+                DynamicParameters createQuizParameters = new DynamicParameters();
+                createQuizParameters.Add("JobApplicationId", newAppId, DbType.Int32);
+                createQuizParameters.Add("StudentId", studentId, DbType.Int32);
+
+                if (!_dapper.ExecuteSqlWithParameters(createQuizSql, createQuizParameters))
                 {
                     throw new Exception("Cant create Quiz");
                 }
 
-                string quizIdSql = "SELECT QuizId FROM JobFinderSchema.Quizzes WHERE JobApplicationId = " + newAppId;
+                string quizIdSql = "SELECT QuizId FROM JobFinderSchema.Quizzes WHERE JobApplicationId = @JobApplicationId";
 
-                int quizId = _dapper.LoadDataSingle<int>(quizIdSql);
+                DynamicParameters quizIdParameters = new DynamicParameters();
+                quizIdParameters.Add("JobApplicationId", newAppId, DbType.Int32);
+
+                int quizId = _dapper.LoadDataSingleWithParameters<int>(quizIdSql, quizIdParameters);
 
                 return RedirectToAction("TakeQuiz", "Quiz", new { quizId = quizId });
             }
@@ -96,41 +116,53 @@ namespace Student_Job_Finder.Controllers
             string applicationsSql = @"
                 SELECT * 
                 FROM JobFinderSchema.JobApplications
-                WHERE JobPostId = " + postId;
-            
-            IEnumerable<JobApplication> applications = _dapper.LoadData<JobApplication>(applicationsSql);
+                WHERE JobPostId = @PostId";
 
+            DynamicParameters applicationsParameters = new DynamicParameters();
+            applicationsParameters.Add("PostId", postId, DbType.Int32);
+
+            IEnumerable<JobApplication> applications = _dapper.LoadDataWithParameters<JobApplication>(applicationsSql, applicationsParameters);
 
             List<JobApplicationViewModel> results = new();
 
             string jobPostSkillsSql = @"
-                     SELECT * FROM JobFinderSchema.JobSkills
-                     WHERE JobPostId = " + postId;
+                 SELECT * FROM JobFinderSchema.JobSkills
+                 WHERE JobPostId = @PostId";
 
-            var jobPostSkills = _dapper.LoadData<JobSkill>(jobPostSkillsSql);
+            DynamicParameters jobPostSkillsParameters = new DynamicParameters();
+            jobPostSkillsParameters.Add("PostId", postId, DbType.Int32);
+
+            var jobPostSkills = _dapper.LoadDataWithParameters<JobSkill>(jobPostSkillsSql, jobPostSkillsParameters);
 
             foreach (var app in applications)
             {
                 string studentInfoSql = @"
                     SELECT FirstName, LastName, Email
                     FROM JobFinderSchema.Users
-                    WHERE UserId = " + app.StudentId;
+                    WHERE UserId = @StudentId";
 
-                var student = _dapper.LoadDataSingle<User>(studentInfoSql);
+                DynamicParameters studentInfoParameters = new DynamicParameters();
+                studentInfoParameters.Add("StudentId", app.StudentId, DbType.Int32);
+
+                var student = _dapper.LoadDataSingleWithParameters<User>(studentInfoSql, studentInfoParameters);
 
                 string studentSkillSql = @"
                      SELECT * FROM JobFinderSchema.StudentSkills
-                     WHERE StudentId = " + app.StudentId;
+                     WHERE StudentId = @StudentId";
 
-                var skills = _dapper.LoadData<StudentSkill>(studentSkillSql);
+                DynamicParameters studentSkillParameters = new DynamicParameters();
+                studentSkillParameters.Add("StudentId", app.StudentId, DbType.Int32);
+
+                var skills = _dapper.LoadDataWithParameters<StudentSkill>(studentSkillSql, studentSkillParameters);
 
                 string quizSql = @"SELECT qs.* FROM JobFinderSchema.QuizSkills qs 
-                           JOIN JobFinderSchema.Quizzes q ON qs.QuizId = q.QuizId 
-                           WHERE q.JobApplicationId = " + app.JobApplicationId;
+                   JOIN JobFinderSchema.Quizzes q ON qs.QuizId = q.QuizId 
+                   WHERE q.JobApplicationId = @JobApplicationId";
 
-                var quizSkills = _dapper.LoadData<QuizSkill>(quizSql);
+                DynamicParameters quizParameters = new DynamicParameters();
+                quizParameters.Add("JobApplicationId", app.JobApplicationId, DbType.Int32);
 
-
+                var quizSkills = _dapper.LoadDataWithParameters<QuizSkill>(quizSql, quizParameters);
 
                 var vm = new JobApplicationViewModel()
                 {
@@ -158,11 +190,14 @@ namespace Student_Job_Finder.Controllers
                 return Unauthorized("Only Recruiters can accept applications");
 
             string acceptApplicationSql = @"
-                        UPDATE JobFinderSchema.JobApplications
-                        SET Status = 'Accepted' 
-                        WHERE JobApplicationId = " + jobApplicationId;
-            
-            var acceptApplication = _dapper.ExecuteSql(acceptApplicationSql);
+                UPDATE JobFinderSchema.JobApplications
+                SET Status = 'Accepted' 
+                WHERE JobApplicationId = @JobApplicationId";
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("JobApplicationId", jobApplicationId, DbType.Int32);
+
+            var acceptApplication = _dapper.ExecuteSqlWithParameters(acceptApplicationSql, parameters);
 
             return RedirectToAction("ViewApplications", new { postId = postId });
 

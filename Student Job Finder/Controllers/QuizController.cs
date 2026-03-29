@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
 using Student_Job_Finder.Models;
 using Student_Job_Finder.Services;
+using System.Data;
 
 namespace Student_Job_Finder.Controllers
 {
@@ -21,11 +23,19 @@ namespace Student_Job_Finder.Controllers
         [HttpGet("AddQuiz/{jobPostId}")]
         public IActionResult AddQuiz(int jobPostId)
         {
-            string sql = "SELECT * FROM JobFinderSchema.Posts WHERE PostId = " + jobPostId;
-            var post = _dapper.LoadDataSingle<JobPost>(sql);
+            string sql = "SELECT * FROM JobFinderSchema.Posts WHERE PostId = @PostId";
 
-            string questionsSql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE JobPostId = " + jobPostId;
-            var questions = _dapper.LoadData<QuizQuestion>(questionsSql);
+            DynamicParameters postParameters = new DynamicParameters();
+            postParameters.Add("PostId", jobPostId, DbType.Int32);
+
+            var post = _dapper.LoadDataSingleWithParameters<JobPost>(sql, postParameters);
+
+            string questionsSql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE JobPostId = @PostId";
+
+            DynamicParameters questionsParameters = new DynamicParameters();
+            questionsParameters.Add("PostId", jobPostId, DbType.Int32);
+
+            var questions = _dapper.LoadDataWithParameters<QuizQuestion>(questionsSql, questionsParameters);
 
             var model = new JobSkillsViewModel
             {
@@ -40,39 +50,51 @@ namespace Student_Job_Finder.Controllers
         [HttpPost("AddQuestion")]
         public IActionResult AddQuestion(QuizQuestionToAddDto question)
         {
-            string sql = "INSERT INTO JobFinderSchema.QuizQuestions " +
-             "(JobPostId, SkillName, QuestionText, OptionA, OptionB, OptionC, OptionD, CorrectOption) " +
-             "VALUES (" +
-             question.JobPostId + ", '" +
-             question.SkillName + "', '" +
-             question.QuestionText + "', '" +
-             question.OptionA + "', '" +
-             question.OptionB + "', '" +
-             question.OptionC + "', '" +
-             question.OptionD + "', '" +
-             question.CorrectOption + "')";
+            string sql = @"
+                INSERT INTO JobFinderSchema.QuizQuestions 
+                    (JobPostId, SkillName, QuestionText, OptionA, OptionB, OptionC, OptionD, CorrectOption) 
+                VALUES 
+                    (@JobPostId, @SkillName, @QuestionText, @OptionA, @OptionB, @OptionC, @OptionD, @CorrectOption)";
 
-            if (_dapper.ExecuteSql(sql))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("JobPostId", question.JobPostId, DbType.Int32);
+            parameters.Add("SkillName", question.SkillName, DbType.String);
+            parameters.Add("QuestionText", question.QuestionText, DbType.String);
+            parameters.Add("OptionA", question.OptionA, DbType.String);
+            parameters.Add("OptionB", question.OptionB, DbType.String);
+            parameters.Add("OptionC", question.OptionC, DbType.String);
+            parameters.Add("OptionD", question.OptionD, DbType.String);
+            parameters.Add("CorrectOption", question.CorrectOption, DbType.String);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return RedirectToAction("AddQuiz", "Quiz", new { jobPostId = question.JobPostId });
             }
+
             throw new Exception("Failed to add question");
         }
 
         [HttpGet("GetQuestions/{jobPostId}")]
         public IActionResult GetQuestions(int jobPostId)
         {
-            string sql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE QuizId = " + jobPostId;
-            var questions = _dapper.LoadData<QuizQuestion>(sql);
+            string sql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE QuizId = @PostId";
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("PostId", jobPostId, DbType.Int32);
+
+            var questions = _dapper.LoadDataWithParameters<QuizQuestion>(sql, parameters);
             return Ok(questions);
         }
 
         [HttpPost("DeleteQuestion/{questionId}")]
         public IActionResult DeleteQuestion(int questionId, int postId)
         {
-            string sql = "DELETE FROM JobFinderSchema.QuizQuestions WHERE QuestionId = " + questionId;
+            string sql = "DELETE FROM JobFinderSchema.QuizQuestions WHERE QuestionId = @QuestionId";
 
-            if (_dapper.ExecuteSql(sql))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("QuestionId", questionId, DbType.Int32);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return RedirectToAction("AddQuiz", "Quiz", new { jobPostId = postId });
             }
@@ -83,14 +105,26 @@ namespace Student_Job_Finder.Controllers
         [HttpGet("TakeQuiz/{quizId}")]
         public IActionResult TakeQuiz(int quizId)
         {
-            string quizSql = "SELECT * FROM JobFinderSchema.Quizzes WHERE QuizId = " + quizId;
-            var quiz = _dapper.LoadDataSingle<Quiz>(quizSql);
+            string quizSql = "SELECT * FROM JobFinderSchema.Quizzes WHERE QuizId = @QuizId";
 
-            string appIdSql = "SELECT JobPostId FROM JobFinderSchema.JobApplications WHERE JobApplicationId = " + quiz.JobApplicationId;
-            int jobPostId = _dapper.LoadDataSingle<int>(appIdSql);
+            DynamicParameters quizParameters = new DynamicParameters();
+            quizParameters.Add("QuizId", quizId, DbType.Int32);
 
-            string questionsSql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE JobPostId = " + jobPostId;
-            var questions = _dapper.LoadData<QuizQuestion>(questionsSql);
+            var quiz = _dapper.LoadDataSingleWithParameters<Quiz>(quizSql, quizParameters);
+
+            string appIdSql = "SELECT JobPostId FROM JobFinderSchema.JobApplications WHERE JobApplicationId = @JobApplicationId";
+
+            DynamicParameters appParameters = new DynamicParameters();
+            appParameters.Add("JobApplicationId", quiz.JobApplicationId, DbType.Int32);
+
+            int jobPostId = _dapper.LoadDataSingleWithParameters<int>(appIdSql, appParameters);
+
+            string questionsSql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE JobPostId = @JobPostId";
+
+            DynamicParameters questionsParameters = new DynamicParameters();
+            questionsParameters.Add("JobPostId", jobPostId, DbType.Int32);
+
+            var questions = _dapper.LoadDataWithParameters<QuizQuestion>(questionsSql, questionsParameters);
 
             var vm = new TakeQuizViewModel
             {
@@ -111,25 +145,42 @@ namespace Student_Job_Finder.Controllers
                 FROM JobFinderSchema.Quizzes AS Quiz
                 JOIN JobFinderSchema.JobApplications AS Apps 
                 ON Quiz.JobApplicationId = Apps.JobApplicationId 
-                WHERE Quiz.QuizId = " + submission.QuizId;
+                WHERE Quiz.QuizId = @QuizId";
 
-            int jobPostId = _dapper.LoadDataSingle<int>(jobPostSql);
+            DynamicParameters jobPostParams = new DynamicParameters();
+            jobPostParams.Add("QuizId", submission.QuizId, DbType.Int32);
 
-            string quizQuestionsSql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE JobPostId = " + jobPostId;
-            var quizQuestions = _dapper.LoadData<QuizQuestion>(quizQuestionsSql).ToList();
-;
+            int jobPostId = _dapper.LoadDataSingleWithParameters<int>(jobPostSql, jobPostParams);
+
+            string quizQuestionsSql = "SELECT * FROM JobFinderSchema.QuizQuestions WHERE JobPostId = @JobPostId";
+
+            DynamicParameters questionsParams = new DynamicParameters();
+            questionsParams.Add("JobPostId", jobPostId, DbType.Int32);
+
+            var quizQuestions = _dapper.LoadDataWithParameters<QuizQuestion>(quizQuestionsSql, questionsParams).ToList();
+
             var calculatedSkills = QuizService.CalculateScores(submission.QuizId, quizQuestions, submission.Answers);
 
             foreach (var skill in calculatedSkills)
             {
-                string insertSql = $@"
-                    INSERT INTO JobFinderSchema.QuizSkills (QuizId, SkillName, SkillScore) 
-                    VALUES ({skill.QuizId}, '{skill.SkillName}', {skill.SkillScore})";
+                string insertSql = @"
+            INSERT INTO JobFinderSchema.QuizSkills (QuizId, SkillName, SkillScore) 
+            VALUES (@QuizId, @SkillName, @SkillScore)";
 
-                _dapper.ExecuteSql(insertSql);
+                DynamicParameters skillParams = new DynamicParameters();
+                skillParams.Add("QuizId", skill.QuizId, DbType.Int32);
+                skillParams.Add("SkillName", skill.SkillName, DbType.String);
+                skillParams.Add("SkillScore", skill.SkillScore, DbType.Decimal);
+
+                _dapper.ExecuteSqlWithParameters(insertSql, skillParams);
             }
 
-            _dapper.ExecuteSql("UPDATE JobFinderSchema.Quizzes SET CompletedAt = GETDATE() WHERE QuizId = " + submission.QuizId);
+            string updateSql = "UPDATE JobFinderSchema.Quizzes SET CompletedAt = GETDATE() WHERE QuizId = @QuizId";
+
+            DynamicParameters updateParams = new DynamicParameters();
+            updateParams.Add("QuizId", submission.QuizId, DbType.Int32);
+
+            _dapper.ExecuteSqlWithParameters(updateSql, updateParams);
 
             return RedirectToAction("MatchJobs", "JobMatching");
         }

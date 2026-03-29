@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
 using Student_Job_Finder.Dtos;
 using Student_Job_Finder.Models;
+using System.Data;
 
 namespace Student_Job_Finder.Controllers
 {
@@ -20,14 +22,18 @@ namespace Student_Job_Finder.Controllers
         public User GetSingleUser(int userId)
         {
             string sql = @"
-                  SELECT [UserId],
-                        [FirstName],
-                        [LastName],
-                        [Email],
-                        [Role]
-                  FROM JobFinderSchema.Users
-                       WHERE UserId = " + userId.ToString();
-            User user = _dapper.LoadDataSingle<User>(sql);
+              SELECT [UserId],
+                    [FirstName],
+                    [LastName],
+                    [Email],
+                    [Role]
+              FROM JobFinderSchema.Users
+                   WHERE UserId = @UserId";
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("UserId", userId, DbType.Int32);
+
+            User user = _dapper.LoadDataSingleWithParameters<User>(sql, parameters);
             return user;
         }
 
@@ -35,13 +41,21 @@ namespace Student_Job_Finder.Controllers
         public IActionResult EditUser(User user)
         {
             string sql = @"
-            UPDATE JobFinderSchema.Users
-                SET [Firstname] = '" + user.FirstName + 
-                "', [LastName] = '" + user.LastName + 
-                "', [Email] = '" + user.Email +
-                "', [Role] = '" + user.Role + "'" +
-                "WHERE UserId= " + user.UserId;
-            if (_dapper.ExecuteSql(sql))
+                UPDATE JobFinderSchema.Users
+                    SET [FirstName] = @FirstName, 
+                        [LastName] = @LastName, 
+                        [Email] = @Email, 
+                        [Role] = @Role
+                    WHERE UserId = @UserId";
+
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("FirstName", user.FirstName, DbType.String);
+            parameters.Add("LastName", user.LastName, DbType.String);
+            parameters.Add("Email", user.Email, DbType.String);
+            parameters.Add("Role", user.Role, DbType.String);
+            parameters.Add("UserId", user.UserId, DbType.Int32);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return Ok();
             }
@@ -52,19 +66,26 @@ namespace Student_Job_Finder.Controllers
         [HttpPost("AddUser")]
         public IActionResult AddUser(UserToAddDto user)
         {
-            string sql = @"INSERT INTO JobFinderSchema.Users(
-                [FirstName],
-                [LastName],
-                [Email],
-                [Role]
-            )VALUES(" +
-                "'" + user.FirstName + 
-                "','" + user.LastName + 
-                "','" + user.Email +
-                "','" + user.Role + 
-           "')";
+            string sql = @"
+                INSERT INTO JobFinderSchema.Users (
+                    [FirstName],
+                    [LastName],
+                    [Email],
+                    [Role]
+                ) VALUES (
+                    @FirstName, 
+                    @LastName, 
+                    @Email, 
+                    @Role
+                )";
 
-            if (_dapper.ExecuteSql(sql))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("FirstName", user.FirstName, DbType.String);
+            parameters.Add("LastName", user.LastName, DbType.String);
+            parameters.Add("Email", user.Email, DbType.String);
+            parameters.Add("Role", user.Role, DbType.String);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return Ok();
             }
@@ -77,9 +98,12 @@ namespace Student_Job_Finder.Controllers
         {
             string sql = @"
                 DELETE FROM JobFinderSchema.Users
-                    WHERE UserId = " + userId.ToString();
+                WHERE UserId = @UserId";
 
-            if (_dapper.ExecuteSql(sql))
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("UserId", userId, DbType.Int32);
+
+            if (_dapper.ExecuteSqlWithParameters(sql, parameters))
             {
                 return Ok();
             }

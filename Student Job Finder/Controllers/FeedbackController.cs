@@ -111,7 +111,6 @@ namespace Student_Job_Finder.Controllers
                 WHERE f.RecruiterId = @RecruiterId
                 ORDER BY f.CreatedAt DESC";
 
-            // Reusing your existing recruiterParams
             var reviews = _dapper.LoadDataWithParameters<Feedback>(feedbackSql, recruiterParams);
 
             ViewBag.RecruiterName = recruiterName;
