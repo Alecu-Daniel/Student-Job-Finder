@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Student_Job_Finder.Models.Feedback>
+
+<div class="container reviews-container">
+    <header class="reviews-header">
+        <a href="javascript:history.back()" class="btn-back">
+            <ion-icon name="arrow-back-outline"></ion-icon> Back
+        </a>
+        <h2 class="reviews-title">Feedback for @ViewBag.RecruiterName</h2>
+
+        @if (Model.Any())
+        {
+            <div class="average-rating-badge">
+                <ion-icon name="star"></ion-icon>
+                <span>@Model.Average(x => x.Rating).ToString("0.0") / 5.0</span>
+            </div>
+        }
+    </header>
+
+    <div class="reviews-list">
+        @foreach (var review in Model)
+        {
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-stars">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <ion-icon name="@(i <= review.Rating ? "star" : "star-outline")"></ion-icon>
+                        }
+                    </div>
+                    <span class="review-date">@review.CreatedAt.ToString("MMM yyyy")</span>
+                </div>
+
+                <p class="review-comment">"@review.Comment"</p>
+
+                <div class="review-footer-context">
+                    <ion-icon name="briefcase-outline"></ion-icon>
+                    <span class="review-job-tag">Role: <strong>@review.PostTitle</strong></span>
+                </div>
+            </div>
+        }
+    </div>
+</div>

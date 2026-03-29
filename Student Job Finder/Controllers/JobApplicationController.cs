@@ -137,6 +137,8 @@ namespace Student_Job_Finder.Controllers
                     FirstName = student.FirstName,
                     LastName = student.LastName,
                     Email = student.Email,
+                    JobApplicationId = app.JobApplicationId,
+                    Status = app.Status,
                     StudentSkills = skills.ToList(),
                     RequiredSkills = jobPostSkills.ToList(),
                     QuizResults = quizSkills.ToList()
@@ -148,6 +150,23 @@ namespace Student_Job_Finder.Controllers
             return View("~/Views/JobPosts/Applications.cshtml", results.OrderByDescending(x => x.MatchScore).ToList());
         }
 
+
+        [HttpPost("AcceptApplication/{jobApplicationId}/{postId}")]
+        public IActionResult AcceptApplication(int jobApplicationId, int postId)
+        {
+            if (this.User.FindFirst("userRole")?.Value != "Recruiter")
+                return Unauthorized("Only Recruiters can accept applications");
+
+            string acceptApplicationSql = @"
+                        UPDATE JobFinderSchema.JobApplications
+                        SET Status = 'Accepted' 
+                        WHERE JobApplicationId = " + jobApplicationId;
+            
+            var acceptApplication = _dapper.ExecuteSql(acceptApplicationSql);
+
+            return RedirectToAction("ViewApplications", new { postId = postId });
+
+        }
 
     }
 }

@@ -1,0 +1,69 @@
+﻿.feedback-subtitle {
+    font-size: 1.8rem;
+    color: #636e72;
+    margin-bottom: 2.5rem;
+}
+
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.feedback-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.btn--cancel {
+    background-color: #dfe6e9;
+    color: #2d3436;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn--cancel:hover {
+        background-color: #b2bec3;
+    }
+
+.add-quiz-input-container-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    min-height: 20rem;
+}
+
+.add-quiz-content {
+    padding: 1.2rem;
+    font-size: 1.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    flex-grow: 1;
+    resize: vertical;
+}
+
+.review-footer-context {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px dashed #dfe6e9;
+    font-size: 1.4rem;
+    color: #636e72;
+}
+
+.review-job-tag strong {
+    color: #2d3436;
+    font-weight: 600;
+}
+
+.review-comment {
+    font-size: 1.6rem;
+    line-height: 1.5;
+    color: #2d3436;
+    margin: 1rem 0;
+}

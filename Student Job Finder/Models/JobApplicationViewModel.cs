@@ -8,6 +8,8 @@ namespace Student_Job_Finder.Models
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public string Email { get; set; } = "";
+        public int JobApplicationId { get; set; }
+        public string Status { get; set; } = "";
         public List<StudentSkill> StudentSkills { get; set; } = new();
         public List<JobSkill>   RequiredSkills { get; set; } = new();
         public List<QuizSkill> QuizResults { get; set; } = new();

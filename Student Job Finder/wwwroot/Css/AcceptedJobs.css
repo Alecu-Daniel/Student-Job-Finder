@@ -1,0 +1,113 @@
+﻿.accepted-jobs-container {
+    margin-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+
+.no-accepted-jobs
+{
+    display:flex;
+    gap: 1rem;
+    justify-self:center;
+}
+.no-jobs-icon {
+    font-size: 2rem;
+    color: #cf711f;
+}
+
+.no-accepted-jobs-text {
+    font-size: 2rem;
+}
+
+.accepted-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.accepted-title {
+    font-size: 3.2rem;
+    color: #2d3436;
+    margin-bottom: 1rem;
+}
+
+.accepted-subtitle {
+    font-size: 1.8rem;
+    color: #636e72;
+}
+
+.accepted-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2.5rem;
+}
+
+.accepted-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e1e8ed;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+    .accepted-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+.accepted-card-content {
+    padding: 2.5rem;
+    flex-grow: 1;
+}
+
+.accepted-badge {
+    display: inline-block;
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 0.4rem 1.2rem;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.accepted-job-title {
+    font-size: 2.2rem;
+    color: #2d3436;
+    margin-bottom: 1rem;
+}
+
+.accepted-recruiter-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.6rem;
+    color: #636e72;
+}
+
+.accepted-card-actions {
+    padding: 1.5rem 2.5rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.btn--feedback-action {
+    display: block;
+    text-align: center;
+    background-color: #e67e22;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+    .btn--feedback-action:hover {
+        background-color: #fff;
+        color: #555;
+        border: 2px solid #e67e22;
+    }

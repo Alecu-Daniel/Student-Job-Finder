@@ -130,6 +130,17 @@ else
                             </li>
                         }
                     </ul>
+
+                    @if (app.Status == "Accepted")
+                    {
+                        <p class="application-view-status">Application Accepted</p>
+                    }
+                    else
+                    {
+                        <form action="/JobApplication/AcceptApplication/@app.JobApplicationId/@ViewContext.RouteData.Values["postId"]" method="post">
+                            <button type="submit" class="btn--form btn application-accept-btn"> Accept </button>
+                        </form>
+                    }
                 }
                 else
                 {

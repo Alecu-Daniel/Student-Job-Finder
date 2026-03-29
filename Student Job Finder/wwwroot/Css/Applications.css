@@ -159,3 +159,14 @@ application-skill-name, application-skill-level {
 .application-extra-icon {
     color: #3F51B5;
 }
+
+
+.application-view-status {
+    margin-top: 3rem;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.application-accept-btn {
+    margin-top: 2rem;
+}

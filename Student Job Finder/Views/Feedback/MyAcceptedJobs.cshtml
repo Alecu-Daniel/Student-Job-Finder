@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Student_Job_Finder.Models.AcceptedJobViewModel>
+
+<div class="container accepted-jobs-container">
+    
+
+    @if (!Model.Any())
+    {
+        <div class="no-accepted-jobs">
+            <ion-icon name="briefcase-outline" class="no-jobs-icon"></ion-icon>
+            <p class="no-accepted-jobs-text">You haven't been marked as "Accepted" for any jobs yet. Keep applying!</p>
+        </div>
+    }
+    else
+    {
+
+        <header class="accepted-header">
+            <h2 class="accepted-title">Congratulations!</h2>
+            <p class="accepted-subtitle">You were accepted for these positions. Share your experience to help other students.</p>
+        </header>
+
+
+        <div class="accepted-grid">
+            @foreach (var job in Model)
+            {
+                <div class="accepted-card">
+                    <div class="accepted-card-content">
+                        <span class="accepted-badge">Hired</span>
+                        <h3 class="accepted-job-title">@job.PostTitle</h3>
+                        <p class="accepted-recruiter-info">
+                            <ion-icon name="person-circle-outline"></ion-icon>
+                            <span>Hired by: <strong>@job.RecruiterName</strong></span>
+                        </p>
+                    </div>
+
+                    <div class="accepted-card-actions">
+                        <a asp-controller="Feedback"
+                           asp-action="SubmitFeedback"
+                           asp-route-appId="@job.JobApplicationId"
+                           class="btn btn--feedback-action">
+                            Leave Feedback
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
