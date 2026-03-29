@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Student_Job_Finder.Data;
+using Student_Job_Finder.Helpers;
 using Student_Job_Finder.Models;
 using Student_Job_Finder.Services;
-using Student_Job_Finder.Helpers;
+using System.Data;
 
 namespace Student_Job_Finder.Controllers
 {
@@ -28,12 +30,15 @@ namespace Student_Job_Finder.Controllers
 
             int userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
 
-            string studentSql = "SELECT * FROM JobFinderSchema.StudentSkills WHERE StudentId = '" + userId + "'";
-            var studentSkills = _dapper.LoadData<StudentSkill>(studentSql);
+            string studentSql = "SELECT * FROM JobFinderSchema.StudentSkills WHERE StudentId = @StudentId";
+
+            DynamicParameters studentParameters = new DynamicParameters();
+            studentParameters.Add("StudentId", userId, DbType.Int32);
+
+            var studentSkills = _dapper.LoadDataWithParameters<StudentSkill>(studentSql, studentParameters);
 
             string jobsSql = "SELECT * FROM JobFinderSchema.Posts";
             var jobs = _dapper.LoadData<JobPost>(jobsSql).ToList();
-
 
             string jobSkillsSql = "SELECT * FROM JobFinderSchema.JobSkills";
             var jobSkills = _dapper.LoadData<JobSkill>(jobSkillsSql);
