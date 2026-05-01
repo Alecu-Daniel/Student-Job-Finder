@@ -49,9 +49,15 @@
                 <select id="SkillName" name="SkillName" required class="edit-post-input">
                     @foreach (var skill in SkillHelper.allSkills)
                     {
-                        <option value="@skill">
-                            @skill
-                        </option>
+                        bool alreadyAdded = Model.PostSkills.Any(s => s.SkillName == skill);
+
+                        if(!alreadyAdded)
+                        {
+                            <option value="@skill">
+                                @skill
+                            </option>
+                        }
+                       
                     }
                 </select>
 
