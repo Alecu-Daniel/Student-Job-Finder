@@ -170,3 +170,10 @@ application-skill-name, application-skill-level {
 .application-accept-btn {
     margin-top: 2rem;
 }
+
+@media (max-width: 137em)
+{
+    .applications-list {
+        grid-template-columns: 1fr 1fr
+    }
+}
